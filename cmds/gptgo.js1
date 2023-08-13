@@ -1,0 +1,47 @@
+const axios = require('axios');
+
+const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';
+
+const axiosInstance = axios.create({
+  headers: {
+    'User-Agent': userAgent,
+  },
+});
+
+async function hex(event, api) {
+  if (event.body.includes('-help')) {
+    const usage = "Usage: hex [text]\n\n" +
+      "Description: Generates response based on the provided text.\n\n" +
+      "Example: hex How are you?\n\n" +
+      "Note: The command expects a text input.";
+    api.sendMessage(usage, event.threadID);
+    return;
+  }
+
+  const getToken = tex => tex.split(/"/).find($ => /^eyJ/.test($));
+  const getContent = tex => tex.split(/data\: /).filter($ => /^\{"i/.test($)).map($ => $ = JSON.parse($.replace(/\n\n$/, ''))).map($ => $.choices[0].delta.content || '').join('');
+
+  let text = event.body.slice(4).trim();
+
+  if (text.length === 0) {
+    api.sendMessage("Hello! How can I assist you today?", event.threadID, event.messageID);
+    return;
+  }
+
+  const uri = encodeURI(text);
+
+  try {
+    const response1 = await axiosInstance.get(`https://gptgo.ai/?q=${uri}&hl=vi&hlgpt=default#gsc.tab=0&gsc.q=${uri}&gsc.page=1`);
+    const token = getToken(response1.data);
+
+    const response2 = await axiosInstance.get(`https://gptgo.ai/action_ai_gpt.php?token=${token}`);
+    const content = getContent(response2.data);
+
+    api.sendMessage(content, event.threadID, event.messageID);
+  } catch (error) {
+    console.error(error);
+    api.sendMessage('An error occurred while processing the command. Please try again later.', event.threadID);
+  }
+}
+
+module.exports = hex;
