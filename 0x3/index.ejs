@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Poppins|Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #282c34;
+            --secondary-color: #61dafb;
+            --white-color: #f8f8f2;
+            --bg-color: #282c34;
+            --error-color: #e06c75;
+            --success-color: #98c379;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: 'Roboto Mono', monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+           /* background-color: var(--bg-color);*/
+            color: var(--white-color);
+        }
+        
+        canvas {
+  position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  width: 100%;
+  height: 100%;
+  background-color: hsla(240deg, 20%, 20%, 1);
+}
+
+        #BotGenius {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            border-radius: 10px;
+            box-sizing: border-box;
+            /*background-color: var(--primary-color);*/
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        }
+       
+        #BotGenius h2, #BotGenius p {
+            text-align: center;
+            color: var(--secondary-color);
+        }
+
+        #BotGenius .form-field {
+            margin-bottom: 20px;
+        }
+
+        #BotGenius label {
+            display: block;
+            color: var(--white-color);
+            margin-bottom: 5px;
+        }
+
+        #appstate {
+            width: 100%;
+            height: 320px;
+            padding: 10px;
+            color: var(--secondary-color);
+            background-color: transparent;
+            border: 2px solid var(--secondary-color);
+            box-sizing: border-box;
+            border-radius: 5px;
+            font-family: 'Roboto Mono', monospace;
+            resize: none;
+        }
+
+        #getcookies, #submit {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+
+        #paste:hover, #submit:hover {
+            background-color: var(--white-color);
+            color: var(--primary-color);
+        }
+
+        #getcookies {
+        	margin-top: 10px;
+            float: right;
+        }
+
+        #agreement-section label {          
+            font-size: 0.8em;          
+            display: inline;
+            color: var(--white-color);
+        }
+
+        #agreement-section input[type="checkbox"] {
+            display: inline;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        #BotGenius a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        #BotGenius a:hover {
+            color: var(--white-color);
+        }
+
+        #message, #error {
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        #message {
+            background-color: var(--success-color);
+            color: var(--primary-color);
+        }
+
+        #error {
+            background-color: var(--error-color);
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            #appstate {
+              height: 300px;
+            }
+        }
+      
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    background-color: var(--primary-color);
+    width: 400px; 
+    position: fixed;
+    top: 40%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    color: var(--white-color);
+    font-family: 'Poppins', sans-serif;
+}
+
+.close {
+    color: var(--white-color);
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.close:hover {
+    cursor: pointer;
+}
+
+.modal h2 {
+    color: var(--secondary-color);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.modal .form-field {
+    margin-bottom: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;        
+}
+
+.modal label {
+    display: block;
+    color: var(--white-color);
+}
+
+.modal input[type="text"],
+.modal input[type="password"] {
+    width: 90%;
+    padding: 10px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    background-color: transparent;
+    color: var(--white-color);
+}
+.modal input:hover, .modal input:focus {
+    outline: none;
+}
+
+.modal button {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    width: 100%;
+}
+
+.modal button:hover {
+    background-color: var(--white-color);
+    color: var(--primary-color);
+}
+
+.warning-text {
+    font-size: 10px;
+    color: var(--error-color);
+    text-align: center;
+    margin-top: 15px;
+}
+
+nav {
+  position: fixed;
+  top: 0;
+  background-color: var(--primary-color);
+  height: 3rem;
+  width: 100%;
+  box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+  z-index: 2;
+}
+nav h1 {
+  font-size: 22px;
+  color: var(--secondary-color);
+  margin-left: 1rem;
+  display: inline-block;
+  position: relative;
+  top: -8px;
+} 
+nav .nav-links {
+  float: right;
+  position: relative;
+  top: -2px;
+} 
+nav .nav-links ul {
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  margin-right: 0.7rem;
+}
+nav .nav-links ul li {
+  margin: 0 0.8rem;
+} 
+nav .nav-links ul li a {
+  text-decoration: none;
+  color: white;
+  transition: 0.3s;
+}
+nav .nav-links ul li a:hover {
+  color: var(--secondary-color);
+}
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3; 
+    transition: 1s;
+}
+.preloader .spinner {
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--secondary-color);
+  border-top-color: #161a21;
+  border-radius: 50%;
+  animation: spin 0.8s ease-in-out infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}     
+ @media (max-width: 600px) {
+    .modal-content {
+          width: 300px;
+    }
+     nav .nav-links ul li {
+       margin: 0 0.5rem;
+     }
+   #BotGenius {
+     margin-top: 4.5rem;
+   } 
+      }
+ @media (max-width: 400px) {
+    .modal-content {
+          width: 250px;
+    }
+     nav .nav-links ul li {
+       margin: 0 0.2rem;
+     }
+   }
+    </style>
+</head>
+<body>
+	<canvas id="hexa"></canvas>
+  <div class="preloader">
+        <div class="spinner"></div>
+  </div>
+  <nav>
+    <h1>Hexabot</h1>
+    <div class="nav-links">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/getfbstate">Appstate</a></li>
+        <li><a href="/status">Bss</a></li>
+        <li><a href="/">Docs</a></li>
+      </ul>
+    </div>
+  </nav>
+    <div id="BotGenius" class="section">
+        <h2>BotGenius (BETA)</h2>
+        <p>Create Intelligent Chatbots with AppState Cookies</p>
+        
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Please log in..</h2>
+        <p class="warning-text">Note: To ensure the security of your account, we recommend using a dummy account when logging in, as there have been instances where accounts were locked due to unusual login attempts..</p>
+        <div class="form-field">
+            <input type="text" id="username" name="username" placeholder="Username" required>
+        </div>
+        <div class="form-field">
+            <input type="password" id="password" name="password" placeholder="Password" required>
+        </div>
+        <div class="form-field">
+            <button type="button" onclick="submitCredentials()" id="gtc">Submit</button>
+        </div>
+    </div>
+</div>
+
+        <form id="appstateForm">
+            <div class="form-field">
+                <label for="appstate">Cookies</label>
+                <textarea id="appstate" name="appstate" required placeholder="Please click the 'Get Cookies' button to retrieve the AppState cookies. If the provided user and password are successful, the cookies will be automatically filled in this form."></textarea>
+        <button type="button" onclick="openModal()"id="getcookies">Get Cookies</button>
+              
+            </div>
+            <div class="form-field" id="agreement-section">
+                <input type="checkbox" id="agreement" name="agreement" required>
+                <label for="agreement" id="agreementLabel"></label>
+            </div>
+            <div class="form-field">
+                <button type="submit" id="submit">Submit Cookies</button>
+            </div>
+</form>
+        <div id="message" class="message" style="display: none;"></div>
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+          <script>
+            //Preloader
+            window.addEventListener("load", function () {
+                var preloader = document.querySelector(".preloader");
+                setTimeout(() => {
+                    preloader.style.visibility = "hidden";
+                    preloader.style.opacity = "0";
+                }, 1000);
+            });
+                             
+        const agreementLabel = document.getElementById('agreementLabel');
+        const agreementText = "By checking this box, I acknowledge that unauthorized use of Facebook cookies is strictly prohibited. I understand that any suspicious activity may lead to the disabling or locking of my Facebook account.";
+        let agreementIndex = 0;
+        let agreementTypingInterval;
+
+        function typeAgreementText() {
+            agreementLabel.textContent += agreementText.charAt(agreementIndex);
+            agreementIndex++;
+            if (agreementIndex >= agreementText.length) {
+                clearInterval(agreementTypingInterval);
+            }
+        }
+
+        agreementTypingInterval = setInterval(typeAgreementText, 50);
+
+        document.getElementById('appstateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const appstateInput = document.getElementById('appstate');
+            const appStateData = appstateInput.value.trim();
+
+            const apiUrl = `https://hexabot.iampat404.repl.co/api/appstate?cookies=${encodeURIComponent(appStateData)}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                console.log('AppState API response', response);
+                console.log('AppState API data', data);
+
+                if (response.ok) {
+                    document.getElementById('message').textContent = `Successfully submitted appstate.`;
+                    document.getElementById('message').style.display = 'block';
+                    document.getElementById('error').style.display = 'none';
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                console.error('AppState API error', error);
+                document.getElementById('error').textContent = `Error: ${error.message}`;
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('message').style.display = 'none';
+            }
+        });
+
+       let modal = document.getElementById('myModal');
+
+function openModal() {
+    modal.style.display = 'block';
+}
+
+function closeModal() {
+    modal.style.display = 'none';
+}
+
+
+function submitCredentials() {
+
+                   const makePostRequest = async (data, endpoint, callback) => {
+            const sent = await fetch(endpoint, {
+            	method: 'POST',
+                   headers: {
+                   	'Content-Type': 'application/json'
+                   },
+                   body: JSON.stringify(data)
+               })
+               try {
+               	const response = await sent.json()
+                   callback(response)
+               } catch (error) {
+                   console.log(error)
+                   callback(error)
+               }
+             }
+    let gtc = document.getElementById('gtc');
+    gtc.textContent= 'Loading'
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    makePostRequest({ email: username, password }, 'https://fb-cookie.iampat404.repl.co/api', (res) => {
+      if(res.error) {
+          gtc.textContent= 'Error'
+          document.getElementById('error').textContent = `Error: ${res.error}`;
+                document.getElementById('error').style.display = 'block';
+         closeModal(); 
+      } else {
+      gtc.textContent= 'Submit'
+      let appstate = JSON.stringify(res, null, 2) + '\n';
+      document.getElementById('appstate').value = appstate;
+      closeModal(); 
+     } 
+   })          
+}
+
+
+
+(function global() {
+  const canvas = document.getElementById("hexa");
+  const ctx = canvas.getContext("2d");
+  let width;
+  let height;
+  class Line {
+    constructor(origin, size, length, color, style = "pattern") {
+      this.size = size;
+      this.origin = origin;
+      this.length = length;
+      this.color = color;
+      this.style = style;
+      this.origin = `M${origin.x},${origin.y}`;
+      this.offSet = 0;
+      this.line = null;
+      this.offSetSpeed = length / size;
+    }
+    getColorString() {
+      return `hsla(${this.color.h}deg,${this.color.s}%,${this.color.l}%,${this.color.a})`;
+    }
+    generators() {
+      return [
+        {
+          line: `h${this.size}`,
+          mag: this.size
+        },
+        {
+          line: `h-${this.size}`,
+          mag: this.size
+        },
+        {
+          line: `v${this.size}`,
+          mag: this.size
+        },
+        {
+          line: `v-${this.size}`,
+          mag: this.size
+        },
+        {
+          line: `l${this.size},${this.size}`,
+          mag: Math.hypot(this.size, this.size)
+        },
+        {
+          line: `l${this.size}-${this.size}`,
+          mag: Math.hypot(this.size, this.size)
+        },
+        {
+          line: `l-${this.size},${this.size}`,
+          mag: Math.hypot(this.size, this.size)
+        },
+        {
+          line: `l-${this.size}-${this.size}`,
+          mag: Math.hypot(this.size, this.size)
+        }
+      ];
+    }
+    generate() {
+      let segments = this.generators(this.size);
+      let path = this.origin;
+      let mag = 0;
+      let fragment;
+      let i;
+      for (i = 0; i < this.length; i += 1) {
+        fragment = segments[(Math.random() * segments.length) | 0];
+        path += ` ${fragment.line}`;
+        mag += fragment.mag;
+      }
+      this.line = {
+        path,
+        mag
+      };
+      return this;
+    }
+    renderStyle(style) {
+      if (style === "glitches") {
+        ctx.lineDashOffset = this.line.mag + this.offSet;
+        ctx.setLineDash([
+          this.size ** 1.5,
+          (this.line.mag / this.length) * this.size ** 2
+        ]);
+        this.offSet += 20;
+        // this.size / (this.size ** 2);
+        ctx.lineWidth = 2;
+        return this;
+      }
+      if (style === "pattern") {
+        ctx.lineDashOffset = this.line.mag - this.offSet;
+        ctx.setLineDash([this.line.mag, this.line.mag]);
+        this.offSet += 10;
+        //this.size / (this.size ** 100);
+        ctx.lineWidth = 0.2;
+      }
+    }
+    mutatePath() {
+      let lineFragment = this.line.path.split(" ").slice(1);
+      let generator = this.generators();
+      lineFragment[(Math.random() * lineFragment.length) | 0] =
+        generator[(Math.random() * generator.length) | 0].line;
+      this.line.path = `${this.line.path.split(" ")[0]} ${lineFragment.join(
+        " "
+      )}`;
+    }
+    draw() {
+      !this.line && this.generate();
+
+      ctx.strokeStyle = this.getColorString();
+      this.renderStyle(this.style);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.stroke(new Path2D(this.line.path));
+      return this;
+    }
+  }
+  function clear() {
+    ctx.fillStyle = `hsla(200deg, 20%, 10%, 0.3)`;
+    ctx.fillRect(0, 0, width, height);
+  }
+  function generateLines(amount) {
+    let lines = [];
+    let styles = [
+      {
+        size: 1.25,
+        style: "pattern",
+        color: { h: 210, s: 100, l: 70, a: 0.5 }
+      },
+      { size: 2.5, style: "pattern", color: { h: 190, s: 90, l: 50, a: 0.3 } },
+      { size: 5, style: "pattern", color: { h: 210, s: 70, l: 60, a: 0.2 } },
+      { size: 10, style: "pattern", color: { h: 310, s: 80, l: 55, a: 0.15 } },
+      { size: 20, style: "pattern", color: { h: 200, s: 25, l: 35, a: 0.12 } },
+      { size: 20, style: "pattern", color: { h: 210, s: 20, l: 40, a: 0.12 } },
+      { size: 40, style: "pattern", color: { h: 190, s: 40, l: 50, a: 0.12 } },
+      { size: 80, style: "pattern", color: { h: 220, s: 50, l: 60, a: 0.12 } },
+      { size: 40, style: "glitches", color: { h: 300, s: 100, l: 50, a: 0.3 } },
+      { size: 20, style: "glitches", color: { h: 210, s: 100, l: 50, a: 0.3 } },
+      { size: 60, style: "glitches", color: { h: 30, s: 100, l: 50, a: 0.3 } }
+    ];
+    for (let i = 0; i < amount; i += 1) {
+      let style = styles[(Math.random() ** 2 * styles.length) | 0];
+      lines.push(
+        new Line(
+          { x: width * 0.5, y: height * 0.5 },
+          style.size,
+          500 + Math.random() * 1000,
+          style.color,
+          style.style
+        )
+      );
+    }
+    return lines;
+  }
+  let id;
+  function resize() {
+    id = cancelAnimationFrame(id);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+    const lines = generateLines(40);
+    function update() {
+      if (!(id % 3)) {
+        clear();
+        lines.forEach((line) => {
+          line.draw();
+          if (!(id % 5) && Math.random() > 0.95) {
+            line.mutatePath();
+          }
+        });
+      }
+      id = requestAnimationFrame(update);
+    }
+    id = requestAnimationFrame(update);
+  }
+  window.addEventListener("resize", resize, {
+    passive: true
+  });
+  resize();
+})();
+    </script>
+</body>
+</html>
