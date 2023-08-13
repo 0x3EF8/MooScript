@@ -1,0 +1,50 @@
+{
+  "name": "Hexa",
+  "version": "1.0.0",
+  "description": "A sophisticated AI Chatbot designed to assist students in completing their questions, projects, assignments, and other academic tasks. Utilizing a friendly and intuitive interface, Hexa provides reliable and instant support to facilitate learning and academic success.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "AI",
+    "Chatbot",
+    "Education",
+    "Student Support",
+    "Academic Help",
+    "Project Assistance",
+    "Assignment Solutions"
+  ],
+  "author": "Jay Patrick Cano (0x3ef8)",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/cors": "^4.0.0",
+    "@koa/router": "^12.0.0",
+    "@octokit/rest": "^20.0.1",
+    "atob": "^2.1.2",
+    "axios": "^1.4.0",
+    "binlookup": "^2.0.1",
+    "chalk": "^4.1.2",
+    "cheerio": "^1.0.0-rc.12",
+    "child_process": "^1.0.2",
+    "ejs": "^3.1.9",
+    "events": "^3.3.0",
+    "fca-unofficial": "^1.3.10",
+    "figlet": "^1.6.0",
+    "form-data": "^4.0.0",
+    "fs": "^0.0.1-security",
+    "googlethis": "^1.7.1",
+    "koa": "^2.14.2",
+    "koa-static": "^5.0.0",
+    "moment-timezone": "^0.5.43",
+    "namso-cc-gen": "^1.0.0",
+    "openai": "^3.3.0",
+    "pastebin-api": "^5.1.6",
+    "path": "^0.12.7",
+    "progress": "^2.0.3",
+    "recursive-readdir": "^2.2.3",
+    "request": "^2.88.2",
+    "weather-js": "^2.0.0",
+    "youtubei.js": "^5.8.0"
+  }
+}
