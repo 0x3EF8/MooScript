@@ -10,6 +10,12 @@ async function ai(event, api) {
   }
 
   const userMessage = event.body.substring(3).trim();
+
+  if (!userMessage) {
+    api.sendMessage("🤖 AI: Please provide a message for the AI to respond to.", event.threadID);
+    return;
+  }
+
   const apiUrl = `https://claude-unofficial-api.iampat404.repl.co/api/startConversation?message=${encodeURIComponent(userMessage)}`;
 
   api.sendMessage('🤖 AI is thinking...', event.threadID);
