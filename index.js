@@ -16,7 +16,7 @@ const appstateFolderPath = path.join(
 );
 
 figlet.text(
-  "BotGenius",
+  "0xAI BETA",
   {
     font: "Standard",
     horizontalLayout: "default",
