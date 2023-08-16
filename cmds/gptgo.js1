@@ -1,47 +1,78 @@
 const axios = require('axios');
+const FormData = require('form-data');
 
-const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';
+async function gptgoCommand(event, api) {
+  const input = event.body.toLowerCase().trim();
 
-const axiosInstance = axios.create({
-  headers: {
-    'User-Agent': userAgent,
-  },
-});
-
-async function hex(event, api) {
-  if (event.body.includes('-help')) {
-    const usage = "Usage: hex [text]\n\n" +
-      "Description: Generates response based on the provided text.\n\n" +
-      "Example: hex How are you?\n\n" +
-      "Note: The command expects a text input.";
+  if (input.includes("-help")) {
+    const usage = "Usage: gptgo [query]\n\n" +
+      "Description: Generates AI-generated text based on the provided query.\n\n" +
+      "Example: gptgo Tell me a joke.";
     api.sendMessage(usage, event.threadID);
     return;
   }
 
-  const getToken = tex => tex.split(/"/).find($ => /^eyJ/.test($));
-  const getContent = tex => tex.split(/data\: /).filter($ => /^\{"i/.test($)).map($ => $ = JSON.parse($.replace(/\n\n$/, ''))).map($ => $.choices[0].delta.content || '').join('');
-
-  let text = event.body.slice(4).trim();
-
-  if (text.length === 0) {
-    api.sendMessage("Hello! How can I assist you today?", event.threadID, event.messageID);
-    return;
-  }
-
-  const uri = encodeURI(text);
+  const query = input.slice(6);
+  const opts = { proxy: true }; // Adjust this option based on your needs
 
   try {
-    const response1 = await axiosInstance.get(`https://gptgo.ai/?q=${uri}&hl=vi&hlgpt=default#gsc.tab=0&gsc.q=${uri}&gsc.page=1`);
-    const token = getToken(response1.data);
-
-    const response2 = await axiosInstance.get(`https://gptgo.ai/action_ai_gpt.php?token=${token}`);
-    const content = getContent(response2.data);
-
-    api.sendMessage(content, event.threadID, event.messageID);
+    const response = await gptgo(query, opts);
+    api.sendMessage(response, event.threadID, event.messageID);
   } catch (error) {
-    console.error(error);
-    api.sendMessage('An error occurred while processing the command. Please try again later.', event.threadID);
+    console.log(error);
+    api.sendMessage("An error occurred while generating AI-generated text.", event.threadID, event.messageID);
   }
 }
 
-module.exports = hex;
+async function gptgo(q, opts) {
+  if (!opts) opts.proxy = false;
+  let ua = {
+    'user-agent': 'Mozilla/5.0 (Linux; Android 8.1.0; vivo 1811) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.40 Mobile Safari/537.36'
+  };
+  let baseUrl = 'https:/\/gptgo.ai';
+  
+  if (opts.proxy === false) {
+    return new Promise((res, rej) => {
+      axios.get(`${baseUrl}/action_get_token.php?q=${q}&hlgpt=en&hl=en`, {
+        headers: ua
+      }).then(r => {
+        axios.get(`${baseUrl}/action_ai_gpt.php?token=${r.data.token}`, {
+          headers: ua
+        }).then(R => {
+          let arr = R.data.match(/"content":"(.*?)"/g).splice(1);
+          arr.pop();
+          res(arr.join().match(/:"(.*?)"/g).map(e => e.replace(/[:"]/g, '')).join(''));
+        }).catch(e => rej(e.response.data));
+      }).catch(e => rej(e.response.data));
+    });
+  } else if (opts.proxy === true) {
+    let form1 = new FormData();
+    form1.append('url', `${baseUrl}/action_get_token.php?q=${q}&hlgpt=en&hl=en`);
+    let html1 = await axios({
+      method: "post",
+      url: "https:/\/zend2.com/index.php",
+      data: form1,
+      headers: {
+        "user-agent": ua['user-agent'],
+        "Content-Type": "multipart/form-data"
+      }
+    });
+    let token = JSON.parse(html1.data.split("\n")[html1.data.split("\n").length - 1]).token;
+    let form2 = new FormData();
+    form2.append('url', `${baseUrl}/action_ai_gpt.php?token=${token}`);
+    let html2 = await axios({
+      method: "post",
+      url: "https:/\/zend2.com/index.php",
+      data: form2,
+      headers: {
+        "user-agent": ua['user-agent'],
+        "Content-Type": "multipart/form-data"
+      }
+    });
+    let arr = html2.data.match(/"content":"(.*?)"/g).splice(1);
+    arr.pop();
+    return arr.join().match(/:"(.*?)"/g).map(e => e.replace(/[:"]/g, '')).join('');
+  }
+}
+
+module.exports = gptgoCommand;
