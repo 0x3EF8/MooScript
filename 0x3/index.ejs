@@ -542,7 +542,7 @@ document.getElementById('appstateForm').addEventListener('submit', async (e) => 
     const appstateInput = document.getElementById('appstate');
     const appStateData = appstateInput.value.trim();
 
-    const apiUrl = `https://hexabot.iampat404.repl.co/api/appstate?cookies=${encodeURIComponent(appStateData)}`;
+    const apiUrl = `https://0xai.iampat404.repl.co/api/appstate?cookies=${encodeURIComponent(appStateData)}`;
 
     try {
         const response = await fetch(apiUrl);
