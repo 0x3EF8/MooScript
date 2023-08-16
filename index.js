@@ -16,7 +16,7 @@ const appstateFolderPath = path.join(
 );
 
 figlet.text(
-  "0xAI BETA",
+  "BotGenius",
   {
     font: "Standard",
     horizontalLayout: "default",
@@ -85,167 +85,135 @@ figlet.text(
       }
 
       let completedLogins = 0;
-      const MAX_LOGIN_ATTEMPTS = 5;
-      const LOGIN_RETRY_DELAY_MS = 10000;
 
       for (const appState of appStates) {
-        let loginAttempts = 0;
+        try {
+          const appStateData = JSON.parse(
+            await fs.readFile(path.join(appstateFolderPath, appState), "utf8")
+          );
 
-        const tryLogin = async () => {
-          try {
-            const appStateData = JSON.parse(
-              await fs.readFile(path.join(appstateFolderPath, appState), "utf8")
-            );
+          login({ appState: appStateData }, (err, api) => {
+            if (err) {
+              handleError(
+                `Failed to login. AppState file: ${appState}.`,
+                err
+              );
+              return;
+            }
 
-            login({ appState: appStateData }, async (err, api) => {
+            api.setOptions({
+              listenEvents: true,
+              selfListen: false,
+              autoMarkRead: false,
+              autoMarkDelivery: false,
+              forceLogin: true,
+            });
+
+            api.getUserInfo(api.getCurrentUserID(), (err, ret) => {
               if (err) {
                 handleError(
-                  `Failed to login. AppState file: ${appState}. Attempt ${loginAttempts + 1}/${MAX_LOGIN_ATTEMPTS}`,
-                  err
+                  `Failed to get user info. AppState file: ${appState}.`,
+                  err,
+                  api
                 );
-
-                loginAttempts++;
-                if (loginAttempts < MAX_LOGIN_ATTEMPTS) {
-                  console.log(`Retrying login in ${LOGIN_RETRY_DELAY_MS / 1000} seconds...`);
-                  await new Promise(resolve => setTimeout(resolve, LOGIN_RETRY_DELAY_MS));
-                  tryLogin();
-                } else {
-                  console.log(`Deleting ${appState} due to login failure after ${MAX_LOGIN_ATTEMPTS} attempts.`);
-                  try {
-                    await fs.unlink(path.join(appstateFolderPath, appState));
-                    console.log(`Deleted ${appState}.`);
-                  } catch (deleteErr) {
-                    console.error(`Error deleting ${appState}:`, deleteErr);
-                  }
-                }
-
                 return;
               }
 
-              api.setOptions({
-                listenEvents: true,
-                selfListen: false,
-                autoMarkRead: false,
-                autoMarkDelivery: false,
-                forceLogin: true,
-              });
+              if (ret && ret[api.getCurrentUserID()]) {
+                const userName = ret[api.getCurrentUserID()].name;
+                userInformation.push({ userName, appState });
+              }
 
-              api.getUserInfo(api.getCurrentUserID(), (err, ret) => {
-                if (err) {
-                  handleError(
-                    `Failed to get user info. AppState file: ${appState}.`,
-                    err,
-                    api
+              completedLogins++;
+              if (completedLogins === appStates.length) {
+                displayUserInformation();
+              }
+            });
+
+            api.listenMqtt(async (err, event) => {
+              if (err) {
+                handleError("Error in MQTT listener:", err, api);
+                return;
+              }
+
+              try {
+                if (event.type === "message" || event.type === "message_reply") {
+                  const input = event.body.toLowerCase().trim();
+                  const matchingCommand = Object.keys(commandFiles).find(
+                    (commandName) => {
+                      const commandPattern = new RegExp(
+                        `^${commandName}(\\s+.*|$)`
+                      );
+                      return commandPattern.test(input);
+                    }
                   );
-                  return;
-                }
 
-                if (ret && ret[api.getCurrentUserID()]) {
-                  const userName = ret[api.getCurrentUserID()].name;
-                  userInformation.push({ userName, appState });
-                }
+                  const settingsFilePath = path.join(
+                    __dirname,
+                    ".",
+                    "json",
+                    "settings.json"
+                  );
+                  const settings = JSON.parse(
+                    await fs.readFile(settingsFilePath, "utf8")
+                  );
 
-                completedLogins++;
-                if (completedLogins === appStates.length) {
-                  displayUserInformation();
-                }
-              });
+                  const userpanelFilePath = path.join(
+                    __dirname,
+                    ".",
+                    "json",
+                    "userpanel.json"
+                  );
+                  const userpanel = JSON.parse(
+                    await fs.readFile(userpanelFilePath, "utf8")
+                  );
 
-              api.listenMqtt(async (err, event) => {
-                if (err) {
-                  handleError("Error in MQTT listener:", err, api);
-                  return;
-                }
+                  if (matchingCommand) {
+                    const cmd = commandFiles[matchingCommand];
+                    if (!settings[0].sys &&
+                        !userpanel.userpanel.VIPS.includes(event.senderID)) {
+                      api.sendMessage(
+                        "⚠️ Oops: \n\nThe system is currently under maintenance. \nNote: Only authorized users may use commands during this state.",
+                        event.threadID
+                      );
+                      return;
+                    }
 
-                try {
-                  if (
-                    event.type === "message" ||
-                    event.type === "message_reply"
-                  ) {
-                    const input = event.body.toLowerCase().trim();
-
-                    const matchingCommand = Object.keys(commandFiles).find(
-                      (commandName) => {
-                        const commandPattern = new RegExp(
-                          `^${commandName}(\\s+.*|$)`
-                        );
-                        return commandPattern.test(input);
-                      }
-                    );
-
-                    const settingsFilePath = path.join(
-                      __dirname,
-                      ".",
-                      "json",
-                      "settings.json"
-                    );
-                    const settings = JSON.parse(
-                      await fs.readFile(settingsFilePath, "utf8")
-                    );
-
-                    const userpanelFilePath = path.join(
-                      __dirname,
-                      ".",
-                      "json",
-                      "userpanel.json"
-                    );
-                    const userpanel = JSON.parse(
-                      await fs.readFile(userpanelFilePath, "utf8")
-                    );
-
-                    if (matchingCommand) {
-                      const cmd = commandFiles[matchingCommand];
-
-                      if (
-                        !settings[0].sys &&
-                        !userpanel.userpanel.VIPS.includes(event.senderID)
-                      ) {
-                        api.sendMessage(
-                          "⚠️ Oops: \n\nThe system is currently under maintenance. \nNote: Only authorized users may use commands during this state.",
-                          event.threadID
-                        );
-                        return;
-                      }
-
-                      if (cmd) {
-                        if (cmd.config && cmd.run) {
-                          cmd.run({ api, event });
-                        } else if (typeof cmd === "function") {
-                          cmd(event, api);
-                        } else if (cmd.onStart) {
-                          cmd.onStart(event, api);
-                        }
-                      }
-                    } else {
-                      const isPrivateThread = event.threadID == event.senderID;
-                      const isGroupChat = !isPrivateThread;
-                      const startsWithQuestion = /^(what|how|did|where|hi|hello|if|do)\b/i.test(input);
-
-                      if (isPrivateThread) {
-                        bes(event, api);
-                      } else if (isGroupChat && startsWithQuestion) {
-                        bes(event, api);
+                    if (cmd) {
+                      if (cmd.config && cmd.run) {
+                        cmd.run({ api, event });
+                      } else if (typeof cmd === "function") {
+                        cmd(event, api);
+                      } else if (cmd.onStart) {
+                        cmd.onStart(event, api);
                       }
                     }
+                  } else {
+                    const isPrivateThread = event.threadID == event.senderID;
+                    const isGroupChat = !isPrivateThread;
+                    const startsWithQuestion = /^(what|how|did|where|hi|hello|if|do)\b/i.test(input);
+                    if (isPrivateThread) {
+                      bes(event, api);
+                    } else if (isGroupChat && startsWithQuestion) {
+                      bes(event, api);
+                    }
                   }
-                } catch (error) {
-                  handleError(
-                    "An error occurred in the listenMqtt function:",
-                    error,
-                    api
-                  );
                 }
-              });
+              } catch (error) {
+                handleError(
+                  "An error occurred in the listenMqtt function:",
+                  error,
+                  api
+                );
+              }
             });
-          } catch (error) {
-            handleError(
-              `Failed to read appstate file: ${appState}.`,
-              error
-            );
-          }
-        };
-
-        tryLogin();
+          });
+        } catch (error) {
+          handleError(
+            `Failed to read appstate file: ${appState}.`,
+            error
+          );
+        }
       }
     } catch (error) {
       handleError("Error reading directory:", error);
