@@ -16,7 +16,7 @@ const appstateFolderPath = path.join(
 );
 
 figlet.text(
-  "Hexabot",
+  "BotGenius",
   {
     font: "Standard",
     horizontalLayout: "default",
@@ -92,15 +92,21 @@ figlet.text(
             await fs.readFile(path.join(appstateFolderPath, appState), "utf8")
           );
 
-          login({ appState: appStateData }, (err, api) => {
+          login({ appState: appStateData }, async (err, api) => {
             if (err) {
-              handleError(
-                `Failed to login. AppState file: ${appState}.`,
-                err
-              );
+              if (err.error === 'Not logged in') {
+                console.log(`Not logged in. Deleting appstate file: ${appState}`);
+                try {
+                  await fs.unlink(path.join(appstateFolderPath, appState));
+                  console.log(`Deleted appstate file: ${appState}`);
+                } catch (deleteError) {
+                  console.error(`Error deleting appstate file: ${appState}`, deleteError);
+                }
+              } else {
+                handleError(`Failed to login. AppState file: ${appState}.`, err);
+              }
               return;
             }
-
             api.setOptions({
               listenEvents: true,
               selfListen: false,
@@ -171,7 +177,7 @@ figlet.text(
                   if (matchingCommand) {
                     const cmd = commandFiles[matchingCommand];
                     if (!settings[0].sys &&
-                        !userpanel.userpanel.VIPS.includes(event.senderID)) {
+                      !userpanel.userpanel.VIPS.includes(event.senderID)) {
                       api.sendMessage(
                         "⚠️ Oops: \n\nThe system is currently under maintenance. \nNote: Only authorized users may use commands during this state.",
                         event.threadID
