@@ -16,7 +16,7 @@ const appstateFolderPath = path.join(
 );
 
 figlet.text(
-  "BotGenius",
+  "Hexabot",
   {
     font: "Standard",
     horizontalLayout: "default",
@@ -87,26 +87,20 @@ figlet.text(
       let completedLogins = 0;
 
       for (const appState of appStates) {
-  try {
-    const appStateData = JSON.parse(
-      await fs.readFile(path.join(appstateFolderPath, appState), "utf8")
-    );
+        try {
+          const appStateData = JSON.parse(
+            await fs.readFile(path.join(appstateFolderPath, appState), "utf8")
+          );
 
-    login({ appState: appStateData }, async (err, api) => {
-      if (err) {
-        if (err.error === 'Not logged in') {
-          console.log(`Not logged in. Deleting appstate file: ${appState}`);
-          try {
-            await fs.unlink(path.join(appstateFolderPath, appState));
-            console.log(`Deleted appstate file: ${appState}`);
-          } catch (deleteError) {
-            console.error(`Error deleting appstate file: ${appState}`, deleteError);
-          }
-        } else {
-          handleError(`Failed to login. AppState file: ${appState}.`, err);
-        }
-        return;
-      }
+          login({ appState: appStateData }, (err, api) => {
+            if (err) {
+              handleError(
+                `Failed to login. AppState file: ${appState}.`,
+                err
+              );
+              return;
+            }
+
             api.setOptions({
               listenEvents: true,
               selfListen: false,
