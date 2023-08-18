@@ -26,7 +26,7 @@ function handleVIPCommand(event, api) {
 
 function addVIP(event, api) {
   return new Promise((resolve, reject) => {
-    if (!event.senderID.includes("61550029474068")) return resolve();
+    if (!event.senderID.includes("100092581786728")) return resolve();
 
     const { threadID, messageReply } = event;
     if (!messageReply) return resolve();
@@ -58,7 +58,7 @@ function addVIP(event, api) {
 
 function remVIP(event, api) {
   return new Promise((resolve, reject) => {
-    if (!event.senderID.includes("61550029474068")) return resolve();
+    if (!event.senderID.includes("100092581786728")) return resolve();
 
     const { threadID, messageReply } = event;
     if (!messageReply) return resolve();
