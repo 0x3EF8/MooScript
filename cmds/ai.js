@@ -1,35 +1,49 @@
-const axios = require('axios');
+const { Configuration, OpenAIApi } = require("openai");
+const fs = require('fs');
+const path = require('path');
+const apiKeysPath = path.join(__dirname, '..', 'json', 'apiKeys.json');
+const apiKeys = JSON.parse(fs.readFileSync(apiKeysPath));
+const openaiApiKey = apiKeys.openai;
 
 async function ai(event, api) {
-  if (event.body.includes('-help')) {
-    const usage = "Usage: ai [message]\n\n" +
-      "Description: Engages in a conversation with the Advanced AI Assistant and retrieves a sophisticated response.\n\n" +
-      "Example: ai Tell me about quantum physics.";
-    api.sendMessage(usage, event.threadID);
-    return;
-  }
+  const text = event.body.substring(3);
+  const query = text.trim();
+  const configuration = new Configuration({
+    apiKey: openaiApiKey,
+  });
 
-  const userMessage = event.body.substring(3).trim();
-
-  if (!userMessage) {
+  if (!query) {
     api.sendMessage("🤖 AI: Please provide a message for the AI to respond to.", event.threadID);
     return;
   }
 
-  const apiUrl = `https://claude-unofficial-api.iampat404.repl.co/api/startConversation?message=${encodeURIComponent(userMessage)}`;
-
-  api.sendMessage('🤖 AI is thinking...', event.threadID);
+  api.sendMessage("🤖 AI is thinking...", event.threadID);
 
   try {
-    const response = await axios.get(apiUrl);
-    const assistantMessage = response.data.chat_messages.find(msg => msg.sender === 'assistant').text;
+    const openai = new OpenAIApi(configuration);
+    const response = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          "role": "system",
+          "content": `I want you to act as an academician. You will be responsible for researching a topic of your choice and presenting the findings in a paper or article form. Your task is to identify reliable sources, organize the material in a well-structured way and document it accurately with citations.`
+        },
+        {
+          "role": "user",
+          "content": `${query}?`
+        }
+      ],
+      temperature: 0.5,
+      max_tokens: 500,
+      top_p: 0.5,
+      frequency_penalty: 0.5,
+      presence_penalty: 0.2,
+    });
 
-    if (assistantMessage) {
-      api.sendMessage(`🤖 AI: ${assistantMessage}`, event.threadID, event.messageID);
-    } else {
-      api.sendMessage("🤖 AI: I'm sorry, but I couldn't generate a response for your query.", event.threadID, event.messageID);
-    }
+    const assistantResponse = response.data.choices[0].message.content;
+    api.sendMessage(`🤖 AI: ${assistantResponse}`, event.threadID, event.messageID);
   } catch (error) {
+    console.error(error);
     api.sendMessage("🛠️ An error occurred while processing your request. Please try again later.", event.threadID, event.messageID);
   }
 }
