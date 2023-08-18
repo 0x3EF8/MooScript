@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const octokit = new Octokit({
-  auth: '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', 
+  auth: '~~~~~~~', 
 });
 
 const excludedFilesAndDirs = [
