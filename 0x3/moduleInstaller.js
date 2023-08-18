@@ -35,5 +35,5 @@ function handleError(message, error) {
 }
 
 module.exports = {
-    handleError
+    handleError,
 };

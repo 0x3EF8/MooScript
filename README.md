@@ -24,13 +24,13 @@ Hexabot is a Facebook Messenger bot designed to assist students with various fea
 
 ## Usage
 
-- To interact with Hexabot, open a conversation with the bot on Facebook Messenger.
-- Use the available commands to access different features. For example:
-  - Send a file: `getfile <file format> <file_title>`
-  - Ask the AI: `ai <your_question>`
-  - Search music: `music <song title>`
-  - Search video: `video <video_title>`
-  - List all commands: `cmd or cmd 1-10`
+-   To interact with Hexabot, open a conversation with the bot on Facebook Messenger.
+-   Use the available commands to access different features. For example:
+    -   Send a file: `getfile <file format> <file_title>`
+    -   Ask the AI: `ai <your_question>`
+    -   Search music: `music <song title>`
+    -   Search video: `video <video_title>`
+    -   List all commands: `cmd or cmd 1-10`
 
 ## Contributing
 
@@ -42,8 +42,8 @@ Contributions are welcome! If you'd like to contribute to Hexabot, please follow
 
 ## Credits
 
-- The base of this project is built upon [fca-unofficial](https://github.com/VangBanLaNhat/fca-unofficial) library by VangBanLaNhat.
-- Hexabot was developed by Jay Patrick Cano and other Hexclan members.
+-   The base of this project is built upon [fca-unofficial](https://github.com/VangBanLaNhat/fca-unofficial) library by VangBanLaNhat.
+-   Hexabot was developed by Jay Patrick Cano and other Hexclan members.
 
 ## License
 

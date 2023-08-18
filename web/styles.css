@@ -9,9 +9,10 @@
 }
 
 /* Apply styles to the entire document */
-body, html {
+body,
+html {
     height: 100%;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
@@ -44,7 +45,8 @@ canvas {
 }
 
 /* Heading and paragraph styles */
-#BotGenius h2, #BotGenius p {
+#BotGenius h2,
+#BotGenius p {
     text-align: center;
     color: var(--secondary-color);
 }
@@ -72,12 +74,13 @@ canvas {
     border: 2px solid var(--secondary-color);
     box-sizing: border-box;
     border-radius: 5px;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     resize: none;
 }
 
 /* Button styles */
-#getcookies, #submit {
+#getcookies,
+#submit {
     background-color: var(--secondary-color);
     color: var(--primary-color);
     border: none;
@@ -85,14 +88,15 @@ canvas {
     cursor: pointer;
     border-radius: 5px;
     transition: all 0.3s ease;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     font-weight: 600;
     letter-spacing: 0.5px;
     margin-bottom: 1rem;
 }
 
 /* Button hover effect */
-#getcookies:hover, #submit:hover {
+#getcookies:hover,
+#submit:hover {
     background-color: var(--white-color);
     color: var(--primary-color);
 }
@@ -130,7 +134,8 @@ canvas {
 }
 
 /* Styling for message and error displays */
-#message, #error {
+#message,
+#error {
     padding: 20px;
     border-radius: 5px;
     margin-top: 20px;
@@ -181,7 +186,7 @@ canvas {
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     color: var(--white-color);
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
 }
 
 /* Styling for close button */
@@ -232,7 +237,8 @@ canvas {
 }
 
 /* Hover and focus effect for input fields within modal */
-.modal input:hover, .modal input:focus {
+.modal input:hover,
+.modal input:focus {
     outline: none;
 }
 
@@ -245,7 +251,7 @@ canvas {
     cursor: pointer;
     border-radius: 5px;
     transition: all 0.3s ease;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     font-weight: 600;
     letter-spacing: 0.5px;
     width: 100%;
@@ -273,7 +279,11 @@ canvas {
     background-color: var(--primary-color);
     height: 3rem;
     width: 100%;
-    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+    box-shadow:
+        rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+        rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+        rgba(0, 0, 0, 0.1) 0px 4px 6px -1px,
+        rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
     z-index: 2;
 }
 
@@ -321,7 +331,7 @@ canvas {
 }
 
 /* Media query for smaller screens */
-@media (max-width:600px) {
+@media (max-width: 600px) {
     .nav > .nav-btn {
         display: inline-block;
         position: absolute;
@@ -336,7 +346,7 @@ canvas {
         height: 10px;
     }
     .nav > .nav-btn > label:hover,
-    .nav  #nav-check:checked ~ .nav-btn > label {
+    .nav #nav-check:checked ~ .nav-btn > label {
         background-color: var(--primary-color);
     }
 

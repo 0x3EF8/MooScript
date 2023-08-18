@@ -1,43 +1,45 @@
-const https = require('https');
+const https = require("https");
 
 async function urlinfo(event, api) {
-  const input = event.body.toLowerCase().trim();
-  if (input.startsWith("urlinfo")) {
-    const inputArr = input.split(" ");
-    const url = inputArr.length > 1 ? input.slice(8) : '';
+    const input = event.body.toLowerCase().trim();
+    if (input.startsWith("urlinfo")) {
+        const inputArr = input.split(" ");
+        const url = inputArr.length > 1 ? input.slice(8) : "";
 
-    if (inputArr.length > 1 && inputArr[1] == '-help') {
-      const usage = "Usage: urlinfo [url]\n\n";
-      const description = "Description: Retrieves information about a URL.\n\n";
-      const example = "Example: urlinfo https://example.com\n\n";
-      const note = "Note: Make sure to include the complete URL starting with the protocol (e.g., https://).\n";
+        if (inputArr.length > 1 && inputArr[1] == "-help") {
+            const usage = "Usage: urlinfo [url]\n\n";
+            const description = "Description: Retrieves information about a URL.\n\n";
+            const example = "Example: urlinfo https://example.com\n\n";
+            const note = "Note: Make sure to include the complete URL starting with the protocol (e.g., https://).\n";
 
-      const message = usage + description + example + note;
-      api.sendMessage(message, event.threadID);
-      return;
-    }
+            const message = usage + description + example + note;
+            api.sendMessage(message, event.threadID);
+            return;
+        }
 
-    const encodedUrl = encodeURIComponent(url);
+        const encodedUrl = encodeURIComponent(url);
 
-    const apiUrl = `https://ipqualityscore.com/api/json/url/ToklB8lkDC68k381PfAytc7MYLnsSjIl/${encodedUrl}`;
+        const apiUrl = `https://ipqualityscore.com/api/json/url/ToklB8lkDC68k381PfAytc7MYLnsSjIl/${encodedUrl}`;
 
-    try {
-      const response = await new Promise((resolve, reject) => {
-        https.get(apiUrl, (res) => {
-          let rawData = '';
-          res.on('data', (chunk) => {
-            rawData += chunk;
-          });
-          res.on('end', () => {
-            resolve(rawData);
-          });
-        }).on('error', (error) => {
-          reject(error);
-        });
-      });
+        try {
+            const response = await new Promise((resolve, reject) => {
+                https
+                    .get(apiUrl, (res) => {
+                        let rawData = "";
+                        res.on("data", (chunk) => {
+                            rawData += chunk;
+                        });
+                        res.on("end", () => {
+                            resolve(rawData);
+                        });
+                    })
+                    .on("error", (error) => {
+                        reject(error);
+                    });
+            });
 
-      const data = JSON.parse(response);
-      const message = `URL Information:
+            const data = JSON.parse(response);
+            const message = `URL Information:
 -------------------------------------------
 ⌘ URL: ${data.url}
 ⌘ Domain: ${data.domain}
@@ -62,12 +64,12 @@ async function urlinfo(event, api) {
 ⌘ Redirected: ${data.redirected}
 ⌘ Request ID: ${data.request_id}`;
 
-      api.sendMessage(message, event.threadID);
-    } catch (error) {
-      console.error(error.message);
-      api.sendMessage("Error getting URL information. Please try again later.", event.threadID);
+            api.sendMessage(message, event.threadID);
+        } catch (error) {
+            console.error(error.message);
+            api.sendMessage("Error getting URL information. Please try again later.", event.threadID);
+        }
     }
-  }
 }
 
 module.exports = urlinfo;
