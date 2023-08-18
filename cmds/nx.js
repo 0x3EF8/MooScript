@@ -16,7 +16,7 @@ async function textDavinci(event, api) {
   if (data.length < 2) {
     const messages = ["yes baby?", "yep?", "hello", "yup?", "sup?", "tangina bakit?"];
     const randomIndex = Math.floor(Math.random() * messages.length);
-    api.sendMessage(messages[randomIndex], event.threadID);
+    api.sendMessage(messages[randomIndex], event.threadID, event.messageID);
   } else {
     try {
       const openai = new OpenAIApi(configuration);
@@ -31,7 +31,7 @@ async function textDavinci(event, api) {
       });
 
       const response = completion.data.choices[0].text;
-      api.sendMessage(response, event.threadID);
+      api.sendMessage(response, event.threadID, event.messageID);
     } catch (error) {
       api.sendMessage(error.message, event.threadID);
       console.log(error);
