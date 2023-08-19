@@ -1,0 +1,14 @@
+{
+	"name": "pull-from-promise",
+	"description": "Convert promise to a pull-stream",
+	"version": "0.0.1",
+	"repository": "srcagency/pull-from-promise",
+	"scripts": {
+		"test": "node test"
+	},
+	"devDependencies": {
+		"pull-to-promise": "^0.0.1",
+		"tape": "^4.6.2"
+	},
+	"license": "MIT"
+}

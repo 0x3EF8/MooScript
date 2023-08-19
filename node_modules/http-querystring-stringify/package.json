@@ -1,0 +1,13 @@
+{
+	"name": "http-querystring-stringify",
+	"description": "Create querystrings",
+	"version": "1.0.0",
+	"repository": "srcagency/http-querystring-stringify",
+	"scripts": {
+		"test": "node test"
+	},
+	"devDependencies": {
+		"tape": "^4.6.3"
+	},
+	"license": "MIT"
+}
