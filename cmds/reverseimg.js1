@@ -1,0 +1,68 @@
+const google = require("googlethis");
+const fs = require("fs");
+const path = require("path");
+
+async function reverseImageSearch(event, api) {
+  const { threadID, messageID, type, messageReply } = event;
+
+  if (type !== "message_reply") {
+    api.sendMessage(
+      "[ERR] Invalid usage. Please reply to an image message.",
+      threadID,
+      messageID
+    );
+    return;
+  }
+
+  if (
+    !messageReply ||
+    !messageReply.attachments ||
+    messageReply.attachments.length !== 1
+  ) {
+    api.sendMessage(
+      "[ERR] Invalid image. Please reply to a single photo.",
+      threadID,
+      messageID
+    );
+    return;
+  }
+
+  const imagePath = path.join(__dirname, "..", "temp", `reverse.png`);
+
+  const imageUrl = messageReply.attachments[0].url;
+  const imageStream = fs.createWriteStream(imagePath);
+
+  await new Promise((resolve, reject) => {
+    const request = require("request");
+    request.get(imageUrl).pipe(imageStream);
+    imageStream.on("finish", resolve);
+    imageStream.on("error", reject);
+  });
+
+  try {
+    const options = { ris: true };
+    const response = await google.search(fs.readFileSync(imagePath), options);
+    const results = response.reverseImageSearch;
+
+    if (results.length > 0) {
+      let message = "";
+      results.forEach((result) => {
+        message += `Title: ${result.title}\n`;
+        message += `Description: ${result.description}\n`;
+        message += `URL: ${result.url}\n\n`;
+      });
+      api.sendMessage(message, threadID, messageID);
+    } else {
+      api.sendMessage("No results found for the image.", threadID, messageID);
+    }
+  } catch (err) {
+    console.error(`Error performing reverse image search: ${err}`);
+    api.sendMessage(
+      "Failed to perform reverse image search. Please try again later.",
+      threadID,
+      messageID
+    );
+  }
+}
+
+module.exports = reverseImageSearch;

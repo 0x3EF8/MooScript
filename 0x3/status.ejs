@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BOTSCOPE: BOT PERFORMANCE MONITORING</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <style>
+      body {
+    font-family: 'Orbitron', sans-serif;
+    background-color: #000;
+    color: #00ccff;
+}
+.container {
+    max-width: 100%;
+}
+h1 {
+    color: #00ccff;
+}
+table {
+    width: 100%;
+    margin-top: 20px;
+    border: 1px solid #00ccff;
+    border-collapse: collapse;
+}
+table th, table td {
+    text-align: left;
+    padding: 10px;
+    color: #00ccff;
+    border: 1px solid #00ccff;
+}
+table td {
+    word-break: break-word;
+}
+table tr:nth-child(even) {
+    background-color: #333;
+}
+.table-responsive {
+    overflow-x: auto;
+}
+.modal-dialog-centered {
+display: flex;
+align-items: center;
+min-height: calc(100% - (1.75rem * 2));
+}
+#addButton {
+position: fixed;
+bottom: 20px;
+right: 20px; 
+box-shadow: 0 0 10px #00ccff;
+animation: glow 2s infinite;
+z-index: 999;
+}
+@keyframes glow {
+    0% { box-shadow: 0 0 5px #00ccff; }
+    50% { box-shadow: 0 0 20px #00ccff, 0 0 30px #00ccff; }
+    100% { box-shadow: 0 0 5px #00ccff; }
+}
+.modal-content {
+    background-color: #000;
+    color: #00ccff;
+    border-color: #00ccff;
+}
+.modal-content .close {
+    color: #00ccff;
+}
+
+
+@media (max-width: 768px) {
+    .table thead {
+        display: none;
+    }
+
+    .table tr {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+    }
+
+    .table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border: none;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .table td:before {
+        content: attr(data-label);
+        flex-basis: 50%;
+        text-align: left;
+        font-weight: bold;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .table, .table thead, .table tbody, .table th, .table td, .table tr {
+        display: block;
+        width: 100%;
+    }
+
+    .table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .table tr {
+        border: 1px solid #ccc;
+        margin-bottom: 1em;
+    }
+
+    .table td {
+        border: none;
+        border-bottom: 1px solid #ddd;
+        position: relative;
+        padding-left: 50%;
+    }
+
+    .table td[data-label]::before {
+        display: inline;
+        position: absolute;
+        left: 6px;
+        top: 6px;
+        width: 45%;
+    }
+}
+
+
+
+
+    </style>
+    
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">BOTSCOPE: BOT PERFORMANCE MONITORING</h1>
+        <button id="addButton" class="btn btn-outline-primary" data-toggle="modal" data-target="#addModal">Add New Url</button>
+        <div class="table-responsive">
+            <table id="statusTable" class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>URL</th>
+                        <th>Status</th>
+                        <th>Uptime</th>
+                        <th>Downtime</th>
+                        <th>Last Ping</th>
+                        <th>Ping</th>
+                        <th>Warnings</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Url</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addForm">
+                        <div class="form-group">
+                            <label for="nameInput">Name</label>
+                            <input type="text" class="form-control" id="nameInput" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="urlInput">URL</label>
+                            <input type="url" class="form-control" id="urlInput" required>
+                        </div>
+                        <p id="message"></p>
+                        <button type="submit" class="btn btn-outline-primary">Add</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function fetchData() {
+            fetch('https://botgenius.hexclanph.repl.co/api/ping/status')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.querySelector("#statusTable tbody");
+                tableBody.innerHTML = '';
+
+                for (const name in data) {
+                    const stat = data[name];
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td data-label="Name">${name}</td>
+                        <td data-label="URL">${stat.url}</td>
+                        <td data-label="Status">${stat.status}</td>
+                        <td data-label="Uptime">${stat.upTime}</td>
+                        <td data-label="Downtime">${stat.downTime}</td>
+                        <td data-label="Last Ping">${new Date(stat.lastPing).toLocaleString()}</td>
+                        <td data-label="Ping">${stat.ping}</td>
+                        <td data-label="Warnings">${stat.warningMessage}</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            });
+        }
+
+        fetchData();
+
+$('#addForm').on('submit', function(event) {
+    event.preventDefault();
+
+    const name = $('#nameInput').val();
+    const url = $('#urlInput').val();
+
+    fetch(`https://botgenius.hexclanph.repl.co/api/ping?name=${encodeURIComponent(name)}&url=${encodeURIComponent(url)}`)
+        .then(response => response.json())
+        .then(data => {
+            
+            if (data.message) {
+                $('#message').text(data.message).css('color', 'green');
+            } else if (data.error) {
+                $('#message').text(data.error).css('color', 'red');
+            }
+            
+            if (!data.error) {
+                $('#addModal').modal('hide');
+                fetchData();
+            }
+        });
+});
+
+    </script>
+</body>
+</html>

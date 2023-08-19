@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Poppins|Roboto+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/styles.css">
+</head>
+<body>
+    <!-- Canvas for background animation -->
+    <canvas id="hexa"></canvas>
+    
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="spinner"></div>
+    </div>
+    
+    <!-- Navigation Bar -->
+    <div class="nav">
+        <input type="checkbox" id="nav-check">
+        <div class="nav-header">
+            <div class="nav-title">
+                BotGenius (BETA)
+            </div>
+        </div>
+        <div class="nav-btn">
+            <label for="nav-check">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+                </svg>
+            </label>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/getfbstate">Appstate</a>
+            <a href="/status">Bss</a>
+            <a href="/">Docs</a>
+            <a href="/">About</a>
+        </div>
+    </div>
+    
+    <!-- BotGenius Main Content -->
+    <div id="BotGenius" class="section">
+        <h2>BotGenius (BETA)</h2>
+        <p>Create Intelligent Chatbots with AppState Cookies</p>
+        
+        <!-- Modal for User Login -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Please log in..</h2>
+                <p class="warning-text">Note: To ensure the security of your account, we recommend using a dummy account when logging in, as there have been instances where accounts were locked due to unusual login attempts..</p>
+                <div class="form-field">
+                    <input type="text" id="username" name="username" placeholder="Username" required>
+                </div>
+                <div class="form-field">
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+                <div class="form-field">
+                    <button type="button" onclick="submitCredentials()" id="gtc">Submit</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form to Submit AppState Cookies -->
+        <form id="appstateForm">
+            <div class="form-field">
+                <label for="appstate">Cookies</label>
+                <textarea id="appstate" name="appstate" required placeholder="Please click the 'Get Cookies' button to retrieve the AppState cookies. If the provided user and password are successful, the cookies will be automatically filled in this form."></textarea>
+                <button type="button" onclick="openModal()" id="getcookies">Get Cookies</button>
+            </div>
+            <div class="form-field" id="agreement-section">
+                <input type="checkbox" id="agreement" name="agreement" required>
+                <label for="agreement" id="agreementLabel"></label>
+            </div>
+            <div class="form-field">
+                <button type="submit" id="submit">Submit Cookies</button>
+            </div>
+        </form>
+        
+        <!-- Display Messages and Errors -->
+        <div id="message" class="message" style="display: none;"></div>
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+    
+    <!-- Include JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>

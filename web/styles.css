@@ -1,0 +1,433 @@
+/* Define custom colors using CSS variables */
+:root {
+    --primary-color: #282c34;
+    --secondary-color: #61dafb;
+    --white-color: #f8f8f2;
+    --bg-color: #282c34;
+    --error-color: #e06c75;
+    --success-color: #98c379;
+}
+
+/* Apply styles to the entire document */
+body,
+html {
+    height: 100%;
+    font-family: "Poppins", sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: var(--white-color);
+}
+
+/* Background animation canvas */
+canvas {
+    /* Fixed position to cover the entire viewport */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    background-color: hsla(240deg, 20%, 20%, 1);
+}
+
+/* Styling for the main content container */
+#BotGenius {
+    max-width: 600px;
+    width: 100%;
+    padding: 20px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Heading and paragraph styles */
+#BotGenius h2,
+#BotGenius p {
+    text-align: center;
+    color: var(--secondary-color);
+}
+
+/* Styling for form fields */
+#BotGenius .form-field {
+    margin-bottom: 20px;
+}
+
+/* Label styles */
+#BotGenius label {
+    display: block;
+    color: var(--white-color);
+    margin-bottom: 5px;
+}
+
+/* Textarea style for cookies */
+#appstate {
+    /* Full width and height, with padding */
+    width: 100%;
+    height: 320px;
+    padding: 10px;
+    color: var(--secondary-color);
+    background-color: transparent;
+    border: 2px solid var(--secondary-color);
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-family: "Poppins", sans-serif;
+    resize: none;
+}
+
+/* Button styles */
+#getcookies,
+#submit {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+}
+
+/* Button hover effect */
+#getcookies:hover,
+#submit:hover {
+    background-color: var(--white-color);
+    color: var(--primary-color);
+}
+
+/* Additional styles for 'Get Cookies' button */
+#getcookies {
+    margin-top: 10px;
+    float: right;
+}
+
+/* Styling for checkbox and agreement label */
+#agreement-section label {
+    font-size: 0.8em;
+    display: inline;
+    color: var(--white-color);
+}
+
+/* Styling for checkbox input */
+#agreement-section input[type="checkbox"] {
+    display: inline;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+/* Styling for links */
+#BotGenius a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+/* Link hover effect */
+#BotGenius a:hover {
+    color: var(--white-color);
+}
+
+/* Styling for message and error displays */
+#message,
+#error {
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+/* Styling for success message */
+#message {
+    background-color: var(--success-color);
+    color: var(--primary-color);
+}
+
+/* Styling for error message */
+#error {
+    background-color: var(--error-color);
+    color: var(--primary-color);
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+    #appstate {
+        height: 300px;
+    }
+}
+
+/* Styling for modal */
+.modal {
+    /* Hidden by default */
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Styling for modal content */
+.modal-content {
+    background-color: var(--primary-color);
+    width: 400px;
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    color: var(--white-color);
+    font-family: "Poppins", sans-serif;
+}
+
+/* Styling for close button */
+.close {
+    color: var(--white-color);
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Hover effect for close button */
+.close:hover {
+    cursor: pointer;
+}
+
+/* Styling for modal headings */
+.modal h2 {
+    color: var(--secondary-color);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Styling for form fields within modal */
+.modal .form-field {
+    margin-bottom: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Styling for modal labels */
+.modal label {
+    display: block;
+    color: var(--white-color);
+}
+
+/* Styling for input fields within modal */
+.modal input[type="text"],
+.modal input[type="password"] {
+    width: 90%;
+    padding: 10px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    background-color: transparent;
+    color: var(--white-color);
+}
+
+/* Hover and focus effect for input fields within modal */
+.modal input:hover,
+.modal input:focus {
+    outline: none;
+}
+
+/* Styling for buttons within modal */
+.modal button {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    width: 100%;
+}
+
+/* Hover effect for buttons within modal */
+.modal button:hover {
+    background-color: var(--white-color);
+    color: var(--primary-color);
+}
+
+/* Styling for warning text */
+.warning-text {
+    font-size: 10px;
+    color: var(--error-color);
+    text-align: center;
+    margin-top: 15px;
+}
+
+/* Navigation bar styling */
+.nav {
+    /* Fixed position at the top */
+    position: fixed;
+    top: 0;
+    background-color: var(--primary-color);
+    height: 3rem;
+    width: 100%;
+    box-shadow:
+        rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+        rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+        rgba(0, 0, 0, 0.1) 0px 4px 6px -1px,
+        rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+    z-index: 2;
+}
+
+/* Navigation header styles */
+.nav > .nav-header {
+    display: inline;
+}
+
+/* Navigation title styles */
+.nav > .nav-header > .nav-title {
+    display: inline-block;
+    font-size: 20px;
+    color: var(--secondary-color);
+    padding: 10px 10px 10px 10px;
+}
+
+/* Navigation button styles */
+.nav > .nav-btn {
+    display: none;
+}
+
+/* Navigation link styles */
+.nav > .nav-links {
+    display: inline;
+    float: right;
+    font-size: 20px;
+}
+
+/* Navigation link item styles */
+.nav > .nav-links > a {
+    display: inline-block;
+    padding: 10px 10px 10px 10px;
+    text-decoration: none;
+    color: var(--secondary-color);
+}
+
+/* Navigation link hover effect */
+.nav > .nav-links > a:hover {
+    background-color: var(--primary-color);
+}
+
+/* Navigation checkbox styles */
+.nav > #nav-check {
+    display: none;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 600px) {
+    .nav > .nav-btn {
+        display: inline-block;
+        position: absolute;
+        right: 0px;
+        top: 0px;
+    }
+    .nav > .nav-btn > label {
+        display: inline-block;
+        width: 50px;
+        color: var(--secondary-color);
+        padding-right: 20px;
+        height: 10px;
+    }
+    .nav > .nav-btn > label:hover,
+    .nav #nav-check:checked ~ .nav-btn > label {
+        background-color: var(--primary-color);
+    }
+
+    .nav > .nav-links {
+        position: absolute;
+        display: block;
+        width: 100%;
+        background-color: var(--primary-color);
+        height: 0px;
+        transition: all 0.3s ease-in;
+        overflow: hidden;
+        top: 50px;
+        right: 0px;
+    }
+    .nav > .nav-links > a {
+        display: block;
+        width: 100%;
+    }
+    .nav > #nav-check:not(:checked) ~ .nav-links {
+        height: 0px;
+    }
+    .nav > #nav-check:checked ~ .nav-links {
+        height: calc(30vh - 20px);
+        overflow-y: auto;
+    }
+}
+
+/* Preloader styling */
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+    transition: 1s;
+}
+
+/* Spinner styling within preloader */
+.preloader .spinner {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--secondary-color);
+    border-top-color: #161a21;
+    border-radius: 50%;
+    animation: spin 0.8s ease-in-out infinite;
+}
+
+/* Spinner animation */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Media query for smaller screens */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 300px;
+    }
+    nav .nav-links ul li {
+        margin: 0 0.5rem;
+    }
+    #BotGenius {
+        margin-top: 4.5rem;
+    }
+}
+
+/* Media query for even smaller screens */
+@media (max-width: 400px) {
+    .modal-content {
+        width: 250px;
+    }
+    nav .nav-links ul li {
+        margin: 0 0.2rem;
+    }
+}
