@@ -16,7 +16,7 @@ const appstateFolderPath = path.join(
 );
 
 figlet.text(
-  "BotGenius",
+  "Hexabot",
   {
     font: "Standard",
     horizontalLayout: "default",
@@ -51,6 +51,7 @@ figlet.text(
       });
 
       const commandFiles = {};
+      const commandErrors = [];
 
       for (const file of cmdFiles) {
         const commandName = file.split(".")[0].toLowerCase();
@@ -58,7 +59,7 @@ figlet.text(
         try {
           commandFiles[commandName] = require(path.join(cmdFolder, file));
         } catch (error) {
-          handleError(`Failed to load command file: ${file}.`, error);
+          commandErrors.push({ commandName, fileName: file });
         }
 
         bar.tick();
@@ -66,9 +67,14 @@ figlet.text(
 
       if (bar.complete) {
         console.log(chalk.green(`\nCommands loaded successfully: ${bar.curr}`));
-        console.log(
-          chalk.red(`Failed to load commands: ${bar.total - bar.curr}\n`)
-        );
+
+        if (commandErrors.length > 0) {
+          console.log(chalk.red(`Failed to load commands: ${commandErrors.length}`));
+          for (const { commandName, fileName } of commandErrors) {
+            console.log(chalk.red(`File name: ${fileName}`));
+          }
+          console.log();
+        }
       }
 
       const userInformation = [];
@@ -85,28 +91,24 @@ figlet.text(
       }
 
       let completedLogins = 0;
+      const loginPromises = [];
 
       for (const appState of appStates) {
-        try {
-          const appStateData = JSON.parse(
-            await fs.readFile(path.join(appstateFolderPath, appState), "utf8")
-          );
+        const appStateData = JSON.parse(
+          await fs.readFile(path.join(appstateFolderPath, appState), "utf8")
+        );
 
+        const loginPromise = new Promise((resolve) => {
           login({ appState: appStateData }, async (err, api) => {
             if (err) {
-              if (err.error === 'Not logged in') {
-                console.log(`Not logged in. Deleting appstate file: ${appState}`);
-                try {
-                  await fs.unlink(path.join(appstateFolderPath, appState));
-                  console.log(`Deleted appstate file: ${appState}`);
-                } catch (deleteError) {
-                  console.error(`Error deleting appstate file: ${appState}`, deleteError);
-                }
-              } else {
-                handleError(`Failed to login. AppState file: ${appState}.`, err);
-              }
+              handleError(
+                `Failed to login. AppState file: ${appState}.`,
+                err
+              );
+              resolve(null);
               return;
             }
+
             api.setOptions({
               listenEvents: true,
               selfListen: false,
@@ -136,91 +138,111 @@ figlet.text(
               }
             });
 
-            api.listenMqtt(async (err, event) => {
-              if (err) {
-                handleError("Error in MQTT listener:", err, api);
-                return;
-              }
+            resolve(api);
+          });
+        });
 
-              try {
-                if (event.type === "message" || event.type === "message_reply") {
-                  const input = event.body.toLowerCase().trim();
-                  const matchingCommand = Object.keys(commandFiles).find(
-                    (commandName) => {
-                      const commandPattern = new RegExp(
-                        `^${commandName}(\\s+.*|$)`
-                      );
-                      return commandPattern.test(input);
-                    }
-                  );
+        loginPromises.push(loginPromise);
+      }
 
-                  const settingsFilePath = path.join(
-                    __dirname,
-                    ".",
-                    "json",
-                    "settings.json"
-                  );
-                  const settings = JSON.parse(
-                    await fs.readFile(settingsFilePath, "utf8")
-                  );
+      const apis = await Promise.all(loginPromises);
 
-                  const userpanelFilePath = path.join(
-                    __dirname,
-                    ".",
-                    "json",
-                    "userpanel.json"
-                  );
-                  const userpanel = JSON.parse(
-                    await fs.readFile(userpanelFilePath, "utf8")
-                  );
+      for (let i = 0; i < apis.length; i++) {
+        const api = apis[i];
+        if (!api) {
+          const appStateToDelete = appStates[i];
+          console.log(`Initiating secure deletion of appstate file: ${appStateToDelete}`);
 
-                  if (matchingCommand) {
-                    const cmd = commandFiles[matchingCommand];
-                    if (!settings[0].sys &&
-                      !userpanel.userpanel.VIPS.includes(event.senderID)) {
-                      api.sendMessage(
-                        "⚠️ Oops: \n\nThe system is currently under maintenance. \nNote: Only authorized users may use commands during this state.",
-                        event.threadID
-                      );
-                      return;
-                    }
+          setTimeout(async () => {
+            try {
+              await fs.unlink(path.join(appstateFolderPath, appStateToDelete));
+              console.log(`✅ Appstate file successfully deleted: ${appStateToDelete}`);
+            } catch (deleteError) {
+              console.error(`❌ Error during appstate file deletion: ${appStateToDelete}`, deleteError);
+            }
+          }, 5000);
+          continue;
+        }
 
-                    if (cmd) {
-                      if (cmd.config && cmd.run) {
-                        cmd.run({ api, event });
-                      } else if (typeof cmd === "function") {
-                        cmd(event, api);
-                      } else if (cmd.onStart) {
-                        cmd.onStart(event, api);
-                      }
-                    }
-                  } else {
-                    const isPrivateThread = event.threadID == event.senderID;
-                    const isGroupChat = !isPrivateThread;
-                    const startsWithQuestion = /^(what|how|did|where|hi|hello|if|do)\b/i.test(input);
-                    if (isPrivateThread) {
-                      bes(event, api);
-                    } else if (isGroupChat && startsWithQuestion) {
-                      bes(event, api);
-                    }
+        api.listenMqtt(async (err, event) => {
+          if (err) {
+            handleError("Error in MQTT listener:", err, api);
+            return;
+          }
+
+          try {
+            if (event.type === "message" || event.type === "message_reply") {
+              const input = event.body.toLowerCase().trim();
+              const matchingCommand = Object.keys(commandFiles).find(
+                (commandName) => {
+                  const commandPattern = new RegExp(
+                    `^${commandName}(\\s+.*|$)`
+                  );
+                  return commandPattern.test(input);
+                }
+              );
+
+              const settingsFilePath = path.join(
+                __dirname,
+                ".",
+                "json",
+                "settings.json"
+              );
+              const settings = JSON.parse(
+                await fs.readFile(settingsFilePath, "utf8")
+              );
+
+              const userpanelFilePath = path.join(
+                __dirname,
+                ".",
+                "json",
+                "userpanel.json"
+              );
+              const userpanel = JSON.parse(
+                await fs.readFile(userpanelFilePath, "utf8")
+              );
+
+              if (matchingCommand) {
+                const cmd = commandFiles[matchingCommand];
+                if (!settings[0].sys &&
+                  !userpanel.userpanel.VIPS.includes(event.senderID)) {
+                  api.sendMessage(
+                    "⚠️ Oops: \n\nThe system is currently under maintenance. \nNote: Only authorized users may use commands during this state.",
+                    event.threadID
+                  );
+                  return;
+                }
+
+                if (cmd) {
+                  if (cmd.config && cmd.run) {
+                    cmd.run({ api, event });
+                  } else if (typeof cmd === "function") {
+                    cmd(event, api);
+                  } else if (cmd.onStart) {
+                    cmd.onStart(event, api);
                   }
                 }
-              } catch (error) {
-                handleError(
-                  "An error occurred in the listenMqtt function:",
-                  error,
-                  api
-                );
+              } else {
+                const isPrivateThread = event.threadID == event.senderID;
+                const isGroupChat = !isPrivateThread;
+                const startsWithQuestion = /^(what|how|did|where|hi|hello|if|do)\b/i.test(input);
+                if (isPrivateThread) {
+                  bes(event, api);
+                } else if (isGroupChat && startsWithQuestion) {
+                  bes(event, api);
+                }
               }
-            });
-          });
-        } catch (error) {
-          handleError(
-            `Failed to read appstate file: ${appState}.`,
-            error
-          );
-        }
+            }
+          } catch (error) {
+            handleError(
+              "An error occurred in the listenMqtt function:",
+              error,
+              api
+            );
+          }
+        });
       }
+
     } catch (error) {
       handleError("Error reading directory:", error);
     }
