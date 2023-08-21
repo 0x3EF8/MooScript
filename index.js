@@ -178,7 +178,9 @@ figlet.text(
           }
 
           try {
-            if (event.type === "message" || event.type === "message_reply") {
+           if (event.type === "event") {
+           	require("./events/handler")({ api, event });
+           } else if (event.type === "message" || event.type === "message_reply") {
               const input = event.body.toLowerCase().trim();
               const matchingCommand = Object.keys(commandFiles).find(
                 (commandName) => {
