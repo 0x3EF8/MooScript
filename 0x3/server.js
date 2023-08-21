@@ -1,4 +1,5 @@
 const Koa = require('koa');
+const chalk = require("chalk");
 const Router = require('@koa/router');
 const path = require('path');
 const ejs = require('ejs');
@@ -7,6 +8,7 @@ const serve = require('koa-static');
 const appstateHandler = require('./fbstateApi.js');
 const pingHandler = require('./botscopeApi.js');
 const EventEmitter = require('events');
+const moment = require('moment-timezone');
 
 global.ee = new EventEmitter();
 
@@ -73,9 +75,13 @@ const startServer = (port) => {
   app.use(router.routes());
   app.use(router.allowedMethods());
 
+  const asiaManilaTime = moment().tz('Asia/Manila').format('YYYY-MM-DD HH:mm:ss'); 
+
   app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
+  const formattedTime = moment().tz('Asia/Manila').format('MM/DD/YY hh:mm A');
+  console.log(chalk.cyan(`[SYSTEM] Status: ONLINE\n[NETWORK] Running on PORT: ${port}`));
+  console.log(chalk.green(`[TIME] Server initiated at: ${formattedTime}`));
+});
 };
 
 const findAvailablePort = (port) => {
