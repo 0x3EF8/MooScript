@@ -1,7 +1,11 @@
 [
   {
     "name": "botscope",
-    "url": "http://botscope.iampat404.repl.co/"
-  }
+    "url": "https://botscope.iampat404.repl.co/"
+  },
+    {
+    "name": "hexa",
+    "url": "https://hexabot.iampat404.repl.co"
+    }
 ]
 
