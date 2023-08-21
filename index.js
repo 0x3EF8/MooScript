@@ -70,6 +70,7 @@ figlet.text(
 
         if (commandErrors.length > 0) {
           console.log(chalk.red(`⚠️  Alert: ${commandErrors.length} command${commandErrors.length === 1 ? '' : 's'} could not be integrated:`));
+
           for (const { fileName, error } of commandErrors) {
             console.log(chalk.red(`Error detected in file: ${fileName}`));
             console.log(chalk.red(`Reason: ${error}`));
@@ -108,7 +109,7 @@ figlet.text(
           login({ appState: appStateData }, async (err, api) => {
             if (err) {
               handleError(
-                `❌ Login failed. Authentication record: ${appState}`,
+                `❌ Login failed. \nAuthentication record: ${appState}`,
                 err
               );
               resolve(null);
@@ -126,7 +127,7 @@ figlet.text(
             api.getUserInfo(api.getCurrentUserID(), (err, ret) => {
               if (err) {
                 handleError(
-                  `❌ Failed to retrieve user information. Authentication record: ${appState}`,
+                  `❌ Failed to retrieve user information. \nAuthentication record: ${appState}`,
                   err,
                   api
                 );
