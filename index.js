@@ -59,33 +59,39 @@ figlet.text(
         try {
           commandFiles[commandName] = require(path.join(cmdFolder, file));
         } catch (error) {
-          commandErrors.push({ commandName, fileName: file });
+          commandErrors.push({ fileName: file, error });
         }
 
         bar.tick();
       }
 
       if (bar.complete) {
-        console.log(chalk.green(`\nCommands loaded successfully: ${bar.curr}`));
+        console.log(chalk.green(`\n✅ Commands successfully integrated: ${cmdFiles.length - commandErrors.length}`));
 
         if (commandErrors.length > 0) {
-          console.log(chalk.red(`Failed to load commands: ${commandErrors.length}`));
-          for (const { commandName, fileName } of commandErrors) {
-            console.log(chalk.red(`File name: ${fileName}`));
+          console.log(chalk.red(`⚠️  Alert: ${commandErrors.length} command${commandErrors.length === 1 ? '' : 's'} could not be integrated:`));
+          for (const { fileName, error } of commandErrors) {
+            console.log(chalk.red(`Error detected in file: ${fileName}`));
+            console.log(chalk.red(`Reason: ${error}`));
+            if (error.stack) {
+              const stackLines = error.stack.split('\n');
+              const lineNumber = stackLines[1].match(/:(\d+):\d+\)$/)[1];
+              console.log(chalk.red(`Line: ${lineNumber}`));
+            }
+            console.log(chalk.red(`---------------------------------`));
           }
           console.log();
         }
       }
-
       const userInformation = [];
 
       function displayUserInformation() {
         console.log("--------------------------------------------------");
-        console.log(chalk.green("Login Successful!"));
+        console.log(chalk.cyan("User Authentication Report"));
         console.log("--------------------------------------------------");
         for (const { userName, appState } of userInformation) {
-          console.log(chalk.green(`User: ${userName} logged in successfully.`));
-          console.log(`AppState file: ${appState}`);
+          console.log(chalk.green(`Verified User: ${userName}`));
+          console.log(`Authentication Record: ${appState}`);
         }
         console.log("--------------------------------------------------");
       }
@@ -102,7 +108,7 @@ figlet.text(
           login({ appState: appStateData }, async (err, api) => {
             if (err) {
               handleError(
-                `Failed to login. AppState file: ${appState}.`,
+                `❌ Login failed. Authentication record: ${appState}`,
                 err
               );
               resolve(null);
@@ -120,7 +126,7 @@ figlet.text(
             api.getUserInfo(api.getCurrentUserID(), (err, ret) => {
               if (err) {
                 handleError(
-                  `Failed to get user info. AppState file: ${appState}.`,
+                  `❌ Failed to retrieve user information. Authentication record: ${appState}`,
                   err,
                   api
                 );
@@ -151,14 +157,14 @@ figlet.text(
         const api = apis[i];
         if (!api) {
           const appStateToDelete = appStates[i];
-          console.log(`Initiating secure deletion of appstate file: ${appStateToDelete}`);
+          console.log(chalk.yellow(`Initiating secure deletion of appstate file: ${appStateToDelete}`));
 
           setTimeout(async () => {
             try {
               await fs.unlink(path.join(appstateFolderPath, appStateToDelete));
-              console.log(`✅ Appstate file successfully deleted: ${appStateToDelete}`);
+              console.log(chalk.green(`✅ Appstate file successfully deleted: ${appStateToDelete}`));
             } catch (deleteError) {
-              console.error(`❌ Error during appstate file deletion: ${appStateToDelete}`, deleteError);
+              console.error(chalk.red(`❌ Error during appstate file deletion: ${appStateToDelete}`, deleteError));
             }
           }, 5000);
           continue;
@@ -207,7 +213,7 @@ figlet.text(
                 if (!settings[0].sys &&
                   !userpanel.userpanel.VIPS.includes(event.senderID)) {
                   api.sendMessage(
-                    "⚠️ Oops: \n\nThe system is currently under maintenance. \nNote: Only authorized users may use commands during this state.",
+                    "⚠️ Alert: The system is currently undergoing maintenance.\nNote: Only authorized users are permitted to use commands during this period.",
                     event.threadID
                   );
                   return;
