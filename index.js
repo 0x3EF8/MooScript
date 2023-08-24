@@ -7,6 +7,7 @@ const figlet = require("figlet");
 const { handleError } = require('./0x3/moduleInstaller.js');
 require("./0x3/server.js");
 const bes = require('./cmds/bes.js');
+const axios = require("axios");
 
 const appstateFolderPath = path.join(
   __dirname,
@@ -14,6 +15,34 @@ const appstateFolderPath = path.join(
   "credentials",
   "cookies"
 );
+
+// https://0x3ef8.github.io/hexabot/package.json
+
+setInterval(
+  function () {
+    checkUpdate();
+  },
+  Math.floor(1800000 * Math.random() + 1200000)
+);
+
+checkUpdate();
+
+async function checkUpdate() {
+  await axios.get("https://0x3ef8.github.io/hexabot/package.json").then((response) => {
+  let ipackage = JSON.parse(response.data);
+  let package = JSON.parse(fs.readFileSync(__dirname + "/package.json", "utf8"));
+  if (ipackage.code > parseInt(package.version.replaceAll(".", ""))) {
+    // new update available
+      let name = ipackage.name;
+      let description = ipackage.description;
+      let changes = ipackage.changes;
+      let version = ipackage.version;
+      let code = ipackage.code;
+  } else {
+    // no update yet / user is already using the latest version
+  }
+});
+}
 
 figlet.text(
   "Hexabot",

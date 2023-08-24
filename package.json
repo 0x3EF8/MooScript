@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js"
   },
+  "whats_new": "Bug Fixes and Improvements.",
   "keywords": [
     "AI",
     "Chatbot",
