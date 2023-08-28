@@ -1,6 +1,6 @@
-# Hexabot - Your Student Assistant Messenger Bot
+# Hexabot - Your Facebook Messenger Bot
 
-Hexabot is a Facebook Messenger bot designed to assist students with various features, including AI-powered responses, file searches, music and video searches, and more. The bot is built using the fca-unofficial library and integrates with APIs to provide a wide range of capabilities.
+[Hexabot](https://github.com/0x3EF8/Hexabot) is a Facebook Messenger bot developed by [Jay Patrick Cano](https://github.com/0x3EF8) and the talented members of [Hexclan](https://github.com/Hexclanph). It is designed to assist students with various features, including AI-powered responses, file searches, music and video searches, and more. The bot is built using the fca-unofficial library and integrates with APIs to provide a wide range of capabilities.
 
 ## Features
 
@@ -43,7 +43,22 @@ Contributions are welcome! If you'd like to contribute to Hexabot, please follow
 ## Credits
 
 - The base of this project is built upon [fca-unofficial](https://github.com/VangBanLaNhat/fca-unofficial) library by VangBanLaNhat.
-- Hexabot was developed by Jay Patrick Cano and other Hexclan members.
+- We extend our gratitude to the various APIs that have contributed to the development of this project. Your valuable services are acknowledged and appreciated.
+
+## Special Thanks
+
+A heartfelt thank you to the individuals who have consistently contributed to the development of this project, providing invaluable insights and assistance:
+
+- [Melvin Jones Gallano Repol](https://github.com/mrepol742)
+- [Nerfe Guno](https://github.com/Humble2021)
+- [Lester Navarra](https://github.com/lester51)
+- [Mart Salazar](https://github.com/mart-anthony-stark)
+- [Marvin Quillo Saik](https://github.com/19Vin70)
+- [John Paul Caigas](https://github.com/mraikero-01)
+- [Techh Jork](https://github.com/techhjork)
+- [Jan Liby Dela Costa](https://github.com/libyzxy0)
+
+Your dedication and support have played a pivotal role in bringing this project to fruition. Thank you for your unwavering commitment and assistance.
 
 ## License
 
