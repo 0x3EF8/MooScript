@@ -60,7 +60,7 @@ A heartfelt thank you to the individuals who have consistently contributed to th
 
 Your dedication and support have played a pivotal role in bringing this project to fruition. Thank you for your unwavering commitment and assistance.
 
-Join Our Group Chat and Community!
+## Join Our Group Chat and Community!
 
 For any concerns, questions, or discussions, we invite you to join our group chat and community:
 
