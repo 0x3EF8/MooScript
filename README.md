@@ -60,6 +60,14 @@ A heartfelt thank you to the individuals who have consistently contributed to th
 
 Your dedication and support have played a pivotal role in bringing this project to fruition. Thank you for your unwavering commitment and assistance.
 
+Join Our Group Chat and Community!
+
+For any concerns, questions, or discussions, we invite you to join our group chat and community:
+
+- Messenger GC: [Join Chat](https://m.me/j/AbbxVGSiV7NNN_3u/)
+- Facebook Group: [Join Our Community](https://facebook.com/groups/955538069091182/)
+
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
