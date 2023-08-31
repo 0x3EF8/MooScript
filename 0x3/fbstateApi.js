@@ -12,7 +12,7 @@ module.exports = async function appstateHandler(ctx) {
   }
 
   let appStateData;
- 
+
   try {
     appStateData = JSON.parse(cookies.replace(/\\/g, ''));
     if (!Array.isArray(appStateData) || appStateData.some(obj => typeof obj !== 'object')) {
@@ -39,9 +39,15 @@ module.exports = async function appstateHandler(ctx) {
 
   const appStateFiles = fs.readdirSync(appStateDirectory);
   const existingAppStateValues = appStateFiles.flatMap((fileName) => {
-    const fileContent = fs.readFileSync(path.join(appStateDirectory, fileName));
-    const fileAppState = JSON.parse(fileContent);
-    return fileAppState;
+    const filePath = path.join(appStateDirectory, fileName);
+    try {
+      const fileContent = fs.readFileSync(filePath, 'utf8');
+      const fileAppState = JSON.parse(fileContent);
+      return fileAppState;
+    } catch (error) {
+      console.error(`Error parsing JSON in file ${filePath}: ${error}`);
+      return [];
+    }
   });
 
   const isDuplicate = appStateData.some(newCookie => 
