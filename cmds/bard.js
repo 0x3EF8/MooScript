@@ -88,31 +88,29 @@ let chat = async (message) => {
     return formatMarkdown(result, images);
   });
 };
-
 async function bardCommand(event, api) {
-  const input = event.body.toLowerCase().split(' ');
-
-  if (input.includes('-help')) {
-    const usage = "Usage: bard [query]\n\n" +
-      "Description: Asks a question to Bard AI and retrieves the response.\n\n" +
-      "Example: bard who is elon musk";
-    api.sendMessage(usage, event.threadID);
-    return;
-  }
-
-  if (input.length < 2) {
-    api.sendMessage("Please provide a valid query.", event.threadID);
-    return;
-  }
-
   try {
     const bardPath = path.join(__dirname, '..', 'json', 'bard.json');
     const sessionCokies = JSON.parse(fs.readFileSync(bardPath));
     let bard = new BardAI(sessionCokies);
     await bard.login();
-    const message = event.body.substring(5).trim();
-    const response = await chat(message);
-    api.sendMessage(response, event.threadID, event.messageID);
+    const response = await chat(event.body);
+
+    const imageUrlPattern = /!\[.*?\]\((.*?)\)/;
+    const matches = response.match(imageUrlPattern);
+
+    if (matches && matches.length > 1) {
+      const imageUrl = matches[1];
+      const txt = response.split('!');
+
+      const imageResponse = await axios.get(imageUrl, { responseType: 'stream' });
+      api.sendMessage({
+        body: txt[0],
+        attachment: imageResponse.data, 
+      }, event.threadID, event.messageID);
+    } else {
+      api.sendMessage(response, event.threadID, event.messageID);
+    }
   } catch (error) {
     console.error('Error:', error.message);
     api.sendMessage('An error occurred while using Bard AI. Please try again later.', event.threadID, event.messageID);
@@ -120,3 +118,20 @@ async function bardCommand(event, api) {
 }
 
 module.exports = bardCommand;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
