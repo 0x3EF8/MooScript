@@ -9,7 +9,7 @@ async function nero(event, api) {
     return;
   }
 
-  const query = event.body.substring(6).trim();
+  const query = event.body.substring(5).trim();
 
   if (!query) {
     api.sendMessage("🤖 Nero: Please provide a question for Nero AI to answer.", event.threadID);
