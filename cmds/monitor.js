@@ -21,7 +21,7 @@ async function botscope(event, api) {
 
   const name = inputArr[1];
   const url = inputArr[2];
-  const apiUrl = `https://botscope.0x3ef8.repl.co/api/ping?name=${encodeURIComponent(name)}&url=${encodeURIComponent(url)}`;
+  const apiUrl = `https://botscope.iampat404.repl.co/api/ping?name=${encodeURIComponent(name)}&url=${encodeURIComponent(url)}`;
 
   https.get(apiUrl, (response) => {
     let data = "";
@@ -34,7 +34,7 @@ async function botscope(event, api) {
         const errorMessage = `ERROR: Failed to add URL to the monitored list.\nReason: ${responseData.error}`;
         api.sendMessage(errorMessage, event.threadID);
       } else {
-const baseUrl = 'https://botscope.0x3ef8.repl.co/';
+const baseUrl = 'https://botscope.iampat404.repl.co/';
 const successMessage = `OK: ${responseData.message}\n\nYou can check the details at the following URL:\n${baseUrl}`;
 api.sendMessage(successMessage, event.threadID);
 
