@@ -17,33 +17,64 @@ async function cmd(event, api) {
     const perPage = 10;
     const totalPages = Math.ceil(commandList.length / perPage);
 
-    let page = parseInt(event.body.toLowerCase().trim().split(' ')[1]) || 1;
-    page = Math.max(1, Math.min(page, totalPages));
+    const userMessage = event.body.toLowerCase().trim();
+    let page = parseInt(userMessage.split(' ')[1]) || 1;
+    let showAll = false;
 
-    const startIndex = (page - 1) * perPage;
-    const endIndex = Math.min(startIndex + perPage, commandList.length);
+    // Check if the user wants to see all commands
+    if (userMessage.includes('-all')) {
+      showAll = true;
+      page = 1; // Reset the page number to 1 when showing all commands
+    }
 
-    const commandsToShow = commandList.slice(startIndex, endIndex);
+    if (showAll) {
+      const formattedDate = moment().tz('Asia/Manila').format('DD/MM/YY, hh:mm:ss A');
 
-    const formattedDate = moment().tz('Asia/Manila').format('DD/MM/YY, hh:mm:ss A');
+      const output = [
+        `┌─[ 卄乇乂 @ ${formattedDate} ]`,
+        '├───────────────────',
+        '│ ┌─[ Hexabot Commands ]',
+        '│ │',
+        ...commandList.map(cmd => `│ ├─[ ${cmd.charAt(0).toUpperCase() + cmd.slice(1)} ]`),
+        '│ │',
+        '│ └─[ All Commands ]',
+        '└───────────────────',
+        '',
+        `Total Commands: ${commandList.length}`,
+        `Showing all commands`,
+        '',
+        'Instructions: To see usage of a specific command, type the command followed by "-help." For example, to understand how to use the "getfile" command, type "getfile -help."',
+      ];
 
-    const output = [
-      `┌─[ 卄乇乂匚ㄥ卂几 @ ${formattedDate} ]`,
-      '├───────────────────',
-      '│ ┌─[ Public Commands ]',
-      '│ │',
-      ...commandsToShow.map(cmd => `│ ├─[ ${cmd.charAt(0).toUpperCase() + cmd.slice(1)} ]`),
-      '│ │',
-      `│ └─[ Page ${page} ]`,
-      '└───────────────────',
-      '',
-      `Total Commands: ${commandList.length}`,
-      `Page ${page}/${totalPages}`,
-      '',
-      'Instructions: To demonstrate the usage of each command, you should enter "-help" after the command. For instance, if you want to understand how to use the "getfile" command, you would type "getfile -help."',
-    ];
+      api.sendMessage(output.join('\n'), event.threadID);
+    } else {
+      page = Math.max(1, Math.min(page, totalPages));
 
-    api.sendMessage(output.join('\n'), event.threadID);
+      const startIndex = (page - 1) * perPage;
+      const endIndex = Math.min(startIndex + perPage, commandList.length);
+
+      const commandsToShow = commandList.slice(startIndex, endIndex);
+
+      const formattedDate = moment().tz('Asia/Manila').format('DD/MM/YY, hh:mm:ss A');
+
+      const output = [
+        `┌─[ 卄乇乂 @ ${formattedDate} ]`,
+        '├───────────────────',
+        '│ ┌─[ Hexabot Commands ]',
+        '│ │',
+        ...commandsToShow.map(cmd => `│ ├─[ ${cmd.charAt(0).toUpperCase() + cmd.slice(1)} ]`),
+        '│ │',
+        `│ └─[ Page ${page} ]`,
+        '└───────────────────',
+        '',
+        `Total Commands: ${commandList.length}`,
+        `Page ${page}/${totalPages}`,
+        '',
+        'Instructions: To see usage of a specific command, type the command followed by "-help." For example, to understand how to use the "getfile" command, type "getfile -help."',
+      ];
+
+      api.sendMessage(output.join('\n'), event.threadID);
+    }
   });
 }
 
