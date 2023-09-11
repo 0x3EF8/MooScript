@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+    <style>
+        /* Define custom colors using CSS variables */
+:root {
+    --primary-color: #282c34;
+    --secondary-color: #61dafb;
+    --white-color: #f8f8f2;
+    --bg-color: #282c34;
+    --error-color: #e06c75;
+    --success-color: #98c379;
+}
+
+/* Apply styles to the entire document */
+body, html {
+    height: 100%;
+    font-family: 'Orbitron', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: var(--white-color);
+}
+
+/* Background animation canvas */
+canvas {
+    /* Fixed position to cover the entire viewport */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    background-color: hsla(240deg, 20%, 20%, 1);
+}
+
+/* Styling for the main content container */
+#BotGenius {
+    position: fixed;
+    width: 100%;
+    padding: 20px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Heading and paragraph styles */
+#BotGenius h2, #BotGenius p {
+    text-align: center;
+    color: var(--secondary-color);
+}
+
+/* Styling for form fields */
+#BotGenius .form-field {
+    margin-bottom: 20px;
+}
+
+/* Label styles */
+#BotGenius label {
+    display: block;
+    color: var(--white-color);
+    margin-bottom: 5px;
+}
+
+/* Textarea style for cookies */
+#appstate {
+    /* Full width and height, with padding */
+    width: 100%;
+    height: 320px;
+    padding: 10px;
+    color: var(--secondary-color);
+    background-color: transparent;
+    border: 2px solid var(--secondary-color);
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-family: 'Orbitron', sans-serif;
+    resize: none;
+}
+
+/* Button styles */
+#getcookies, #submit {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+}
+
+/* Button hover effect */
+#getcookies:hover, #submit:hover {
+    background-color: var(--white-color);
+    color: var(--primary-color);
+}
+
+/* Additional styles for 'Get Cookies' button */
+#getcookies {
+    margin-top: 10px;
+    float: right;
+}
+
+/* Styling for checkbox and agreement label */
+#agreement-section label {
+    font-size: 0.8em;
+    display: inline;
+    color: var(--white-color);
+}
+
+/* Styling for checkbox input */
+#agreement-section input[type="checkbox"] {
+    display: inline;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+/* Styling for links */
+#BotGenius a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+/* Link hover effect */
+#BotGenius a:hover {
+    color: var(--white-color);
+}
+
+/* Styling for message and error displays */
+#message, #error {
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+/* Styling for success message */
+#message {
+    background-color: var(--success-color);
+    color: var(--primary-color);
+}
+
+/* Styling for error message */
+#error {
+    background-color: var(--error-color);
+    color: var(--primary-color);
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+    #appstate {
+        height: 300px;
+    }
+}
+
+/* Styling for modal */
+.modal {
+    /* Hidden by default */
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Styling for modal content */
+.modal-content {
+    background-color: var(--primary-color);
+    width: 400px;
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    color: var(--white-color);
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Styling for close button */
+.close {
+    color: var(--white-color);
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Hover effect for close button */
+.close:hover {
+    cursor: pointer;
+}
+
+/* Styling for modal headings */
+.modal h2 {
+    color: var(--secondary-color);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Styling for form fields within modal */
+.modal .form-field {
+    margin-bottom: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Styling for modal labels */
+.modal label {
+    display: block;
+    color: var(--white-color);
+}
+
+/* Styling for input fields within modal */
+.modal input[type="text"],
+.modal input[type="password"] {
+    width: 90%;
+    padding: 10px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    background-color: transparent;
+    color: var(--white-color);
+}
+
+/* Hover and focus effect for input fields within modal */
+.modal input:hover, .modal input:focus {
+    outline: none;
+}
+
+/* Styling for buttons within modal */
+.modal button {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    width: 100%;
+}
+
+/* Hover effect for buttons within modal */
+.modal button:hover {
+    background-color: var(--white-color);
+    color: var(--primary-color);
+}
+
+/* Styling for warning text */
+.warning-text {
+    font-size: 10px;
+    color: var(--error-color);
+    text-align: center;
+    margin-top: 15px;
+}
+
+/* Navigation bar styling */
+.nav {
+    /* Fixed position at the top */
+    position: fixed;
+    top: 0;
+    background-color: var(--primary-color);
+    height: 3rem;
+    width: 100%;
+    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+    z-index: 2;
+}
+
+/* Navigation header styles */
+.nav > .nav-header {
+    display: inline;
+}
+
+/* Navigation title styles */
+.nav > .nav-header > .nav-title {
+    display: inline-block;
+    font-size: 20px;
+    color: var(--secondary-color);
+    padding: 10px 10px 10px 10px;
+}
+
+/* Navigation button styles */
+.nav > .nav-btn {
+    display: none;
+}
+
+/* Navigation link styles */
+.nav > .nav-links {
+    display: inline;
+    float: right;
+    font-size: 20px;
+}
+
+/* Navigation link item styles */
+.nav > .nav-links > a {
+    display: inline-block;
+    padding: 10px 10px 10px 10px;
+    text-decoration: none;
+    color: var(--secondary-color);
+}
+
+/* Navigation link hover effect */
+.nav > .nav-links > a:hover {
+    background-color: var(--primary-color);
+}
+
+/* Navigation checkbox styles */
+.nav > #nav-check {
+    display: none;
+}
+
+/* Media query for smaller screens */
+@media (max-width:600px) {
+    .nav > .nav-btn {
+        display: inline-block;
+        position: absolute;
+        right: 0px;
+        top: 0px;
+    }
+    .nav > .nav-btn > label {
+        display: inline-block;
+        width: 50px;
+        color: var(--secondary-color);
+        padding-right: 20px;
+        height: 10px;
+    }
+    .nav > .nav-btn > label:hover,
+    .nav  #nav-check:checked ~ .nav-btn > label {
+        background-color: var(--primary-color);
+    }
+
+    .nav > .nav-links {
+        position: absolute;
+        display: block;
+        width: 100%;
+        background-color: var(--primary-color);
+        height: 0px;
+        transition: all 0.3s ease-in;
+        overflow: hidden;
+        top: 50px;
+        right: 0px;
+    }
+    .nav > .nav-links > a {
+        display: block;
+        width: 100%;
+    }
+    .nav > #nav-check:not(:checked) ~ .nav-links {
+        height: 0px;
+    }
+    .nav > #nav-check:checked ~ .nav-links {
+        height: calc(30vh - 20px);
+        overflow-y: auto;
+    }
+}
+
+/* Preloader styling */
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+    transition: 1s;
+}
+
+/* Spinner styling within preloader */
+.preloader .spinner {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--secondary-color);
+    border-top-color: #161a21;
+    border-radius: 50%;
+    animation: spin 0.8s ease-in-out infinite;
+}
+
+/* Spinner animation */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Media query for smaller screens */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 300px;
+    }
+    nav .nav-links ul li {
+        margin: 0 0.5rem;
+    }
+    #BotGenius {
+        margin-top: 4.5rem;
+    }
+}
+
+/* Media query for even smaller screens */
+@media (max-width: 400px) {
+    .modal-content {
+        width: 250px;
+    }
+    nav .nav-links ul li {
+        margin: 0 0.2rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Canvas for background animation -->
+    <canvas id="hexa"></canvas>
+    
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="spinner"></div>
+    </div>
+    
+    <!-- Navigation Bar -->
+    <div class="nav">
+        <input type="checkbox" id="nav-check">
+        <div class="nav-header">
+            <div class="nav-title">
+                HEXABOT (BETA)
+            </div>
+        </div>
+        <div class="nav-btn">
+            <label for="nav-check">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+                </svg>
+            </label>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/getfbstate">Appstate</a>
+            <a href="../README.md">Docs</a>
+        </div>
+    </div>
+    
+    <!-- BotGenius Main Content -->
+    <div id="BotGenius" class="section">
+        <h2>Hexabot (BETA)</h2>
+        <p>Create Intelligent Chatbots with AppState Cookies</p>
+        
+        <!-- Modal for User Login -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Please log in..</h2>
+                <p class="warning-text">Note: To ensure the security of your account, we recommend using a dummy account when logging in, as there have been instances where accounts were locked due to unusual login attempts..</p>
+                <div class="form-field">
+                    <input type="text" id="username" name="username" placeholder="Username" required>
+                </div>
+                <div class="form-field">
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+                <div class="form-field">
+                    <button type="button" onclick="submitCredentials()" id="gtc">Submit</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form to Submit AppState Cookies -->
+        <form id="appstateForm">
+            <div class="form-field">
+                <label for="appstate">Cookies</label>
+                <textarea id="appstate" name="appstate" required placeholder="Please click the 'Get Cookies' button to retrieve the AppState cookies. If the provided user and password are successful, the cookies will be automatically filled in this form."></textarea>
+                <button type="button" onclick="openModal()" id="getcookies">Get Cookies</button>
+            </div>
+            <div class="form-field" id="agreement-section">
+                <input type="checkbox" id="agreement" name="agreement" required>
+                <label for="agreement" id="agreementLabel"></label>
+            </div>
+            <div class="form-field">
+                <button type="submit" id="submit">Submit Cookies</button>
+            </div>
+        </form>
+        
+        <!-- Display Messages and Errors -->
+        <div id="message" class="message" style="display: none;"></div>
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+    
+    <!-- Include JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
+          <script>
+          // Execute this code when the page finishes loading
+window.addEventListener("load", function () {
+    var preloader = document.querySelector(".preloader");
+    setTimeout(() => {
+        preloader.style.visibility = "hidden";
+        preloader.style.opacity = "0";
+    }, 1000);
+});
+
+// Typing animation for the agreement label
+const agreementLabel = document.getElementById('agreementLabel');
+const agreementText = "By checking this box, I acknowledge that unauthorized use of Facebook cookies is strictly prohibited. I understand that any suspicious activity may lead to the disabling or locking of my Facebook account.";
+let agreementIndex = 0;
+let agreementTypingInterval;
+
+function typeAgreementText() {
+    agreementLabel.textContent += agreementText.charAt(agreementIndex);
+    agreementIndex++;
+    if (agreementIndex >= agreementText.length) {
+        clearInterval(agreementTypingInterval);
+    }
+}
+
+agreementTypingInterval = setInterval(typeAgreementText, 50);
+
+// Handling form submission for app state
+document.getElementById('appstateForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const appstateInput = document.getElementById('appstate');
+    const appStateData = appstateInput.value.trim();
+
+    const apiUrl = `api/appstate?cookies=${encodeURIComponent(appStateData)}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        console.log('AppState API response', response);
+        console.log('AppState API data', data);
+
+        if (response.ok) {
+            document.getElementById('message').textContent = `Successfully submitted appstate.`;
+            document.getElementById('message').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+        } else {
+            throw new Error(data.error);
+        }
+    } catch (error) {
+        console.error('AppState API error', error);
+        document.getElementById('error').textContent = `Error: ${error.message}`;
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('message').style.display = 'none';
+    }
+});
+
+// Modal functionality
+let modal = document.getElementById('myModal');
+
+function openModal() {
+    modal.style.display = 'block';
+}
+
+function closeModal() {
+    modal.style.display = 'none';
+}
+
+// Submit credentials to get app state
+function submitCredentials() {
+    // Function to make a POST request
+    const makePostRequest = async (data, endpoint, callback) => {
+        const sent = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        try {
+            const response = await sent.json()
+            callback(response)
+        } catch (error) {
+            console.log(error)
+            callback(error)
+        }
+    }
+    let gtc = document.getElementById('gtc');
+    gtc.textContent= 'Loading'
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    makePostRequest({ email: username, password }, 'https://fb-cookies.0x3ef8.repl.co/api', (res) => {
+        if(res.error) {
+            gtc.textContent= 'Error'
+            document.getElementById('error').textContent = `Error: ${res.error}`;
+            document.getElementById('error').style.display = 'block';
+            closeModal(); 
+        } else {
+            gtc.textContent= 'Submit'
+            let appstate = JSON.stringify(res, null, 2) + '\n';
+            document.getElementById('appstate').value = appstate;
+            closeModal(); 
+        } 
+    })          
+}
+// background animation
+(function global() {
+  const canvas = document.getElementById("hexa");
+  const ctx = canvas.getContext("2d");
+  let width;
+  let height;
+  class Line {
+    constructor(origin, size, length, color, style = "pattern") {
+      this.size = size;
+      this.origin = origin;
+      this.length = length;
+      this.color = color;
+      this.style = style;
+      this.origin = `M${origin.x},${origin.y}`;
+      this.offSet = 0;
+      this.line = null;
+      this.offSetSpeed = length / size;
+    }
+    getColorString() {
+      return `hsla(${this.color.h}deg,${this.color.s}%,${this.color.l}%,${this.color.a})`;
+    }
+    generators() {
+      return [
+        {
+          line: `h${this.size}`,
+          mag: this.size
+        },
+        {
+          line: `h-${this.size}`,
+          mag: this.size
+        },
+        {
+          line: `v${this.size}`,
+          mag: this.size
+        },
+        {
+          line: `v-${this.size}`,
+          mag: this.size
+        },
+        {
+          line: `l${this.size},${this.size}`,
+          mag: Math.hypot(this.size, this.size)
+        },
+        {
+          line: `l${this.size}-${this.size}`,
+          mag: Math.hypot(this.size, this.size)
+        },
+        {
+          line: `l-${this.size},${this.size}`,
+          mag: Math.hypot(this.size, this.size)
+        },
+        {
+          line: `l-${this.size}-${this.size}`,
+          mag: Math.hypot(this.size, this.size)
+        }
+      ];
+    }
+    generate() {
+      let segments = this.generators(this.size);
+      let path = this.origin;
+      let mag = 0;
+      let fragment;
+      let i;
+      for (i = 0; i < this.length; i += 1) {
+        fragment = segments[(Math.random() * segments.length) | 0];
+        path += ` ${fragment.line}`;
+        mag += fragment.mag;
+      }
+      this.line = {
+        path,
+        mag
+      };
+      return this;
+    }
+    renderStyle(style) {
+      if (style === "glitches") {
+        ctx.lineDashOffset = this.line.mag + this.offSet;
+        ctx.setLineDash([
+          this.size ** 1.5,
+          (this.line.mag / this.length) * this.size ** 2
+        ]);
+        this.offSet += 20;
+        // this.size / (this.size ** 2);
+        ctx.lineWidth = 2;
+        return this;
+      }
+      if (style === "pattern") {
+        ctx.lineDashOffset = this.line.mag - this.offSet;
+        ctx.setLineDash([this.line.mag, this.line.mag]);
+        this.offSet += 10;
+        //this.size / (this.size ** 100);
+        ctx.lineWidth = 0.2;
+      }
+    }
+    mutatePath() {
+      let lineFragment = this.line.path.split(" ").slice(1);
+      let generator = this.generators();
+      lineFragment[(Math.random() * lineFragment.length) | 0] =
+        generator[(Math.random() * generator.length) | 0].line;
+      this.line.path = `${this.line.path.split(" ")[0]} ${lineFragment.join(
+        " "
+      )}`;
+    }
+    draw() {
+      !this.line && this.generate();
+
+      ctx.strokeStyle = this.getColorString();
+      this.renderStyle(this.style);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.stroke(new Path2D(this.line.path));
+      return this;
+    }
+  }
+  function clear() {
+    ctx.fillStyle = `hsla(200deg, 20%, 10%, 0.3)`;
+    ctx.fillRect(0, 0, width, height);
+  }
+  function generateLines(amount) {
+    let lines = [];
+    let styles = [
+      {
+        size: 1.25,
+        style: "pattern",
+        color: { h: 210, s: 100, l: 70, a: 0.5 }
+      },
+      { size: 2.5, style: "pattern", color: { h: 190, s: 90, l: 50, a: 0.3 } },
+      { size: 5, style: "pattern", color: { h: 210, s: 70, l: 60, a: 0.2 } },
+      { size: 10, style: "pattern", color: { h: 310, s: 80, l: 55, a: 0.15 } },
+      { size: 20, style: "pattern", color: { h: 200, s: 25, l: 35, a: 0.12 } },
+      { size: 20, style: "pattern", color: { h: 210, s: 20, l: 40, a: 0.12 } },
+      { size: 40, style: "pattern", color: { h: 190, s: 40, l: 50, a: 0.12 } },
+      { size: 80, style: "pattern", color: { h: 220, s: 50, l: 60, a: 0.12 } },
+      { size: 40, style: "glitches", color: { h: 300, s: 100, l: 50, a: 0.3 } },
+      { size: 20, style: "glitches", color: { h: 210, s: 100, l: 50, a: 0.3 } },
+      { size: 60, style: "glitches", color: { h: 30, s: 100, l: 50, a: 0.3 } }
+    ];
+    for (let i = 0; i < amount; i += 1) {
+      let style = styles[(Math.random() ** 2 * styles.length) | 0];
+      lines.push(
+        new Line(
+          { x: width * 0.5, y: height * 0.5 },
+          style.size,
+          500 + Math.random() * 1000,
+          style.color,
+          style.style
+        )
+      );
+    }
+    return lines;
+  }
+  let id;
+  function resize() {
+    id = cancelAnimationFrame(id);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+    const lines = generateLines(40);
+    function update() {
+      if (!(id % 3)) {
+        clear();
+        lines.forEach((line) => {
+          line.draw();
+          if (!(id % 5) && Math.random() > 0.95) {
+            line.mutatePath();
+          }
+        });
+      }
+      id = requestAnimationFrame(update);
+    }
+    id = requestAnimationFrame(update);
+  }
+  window.addEventListener("resize", resize, {
+    passive: true
+  });
+  resize();
+})();
+    </script>
+</body>
+</html>
