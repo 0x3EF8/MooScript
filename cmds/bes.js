@@ -69,7 +69,7 @@ async function processBesCommand(event, api, userMessages, userName, replyMessag
           }
         ],
         temperature: 0.5,
-        max_tokens: 500,
+        max_tokens: 2000,
         top_p: 0.9,
         frequency_penalty: 0.6,
         presence_penalty: 0.6,
