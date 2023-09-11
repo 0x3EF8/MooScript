@@ -1,8 +1,0 @@
-function handleEvent(api, event) {
-  console.log("Event received:", event);
-  if (event.type === "message" && event.body.toLowerCase() === "hello") 
-    api.sendMessage("Hi there!", event.threadID);
-  }
-}
-
-module.exports = handleEvent;
