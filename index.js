@@ -6,9 +6,9 @@ const chalk = require("chalk");
 const figlet = require("figlet");
 const { handleError } = require('./0x3/moduleInstaller.js');
 require("./0x3/server.js");
-const pat = require('./cmds/pat.js');
-const bes = require('./cmds/bes.js');
-
+/*const pat = require('./cmds/pat.js');*/
+const nero = require('./0x3/blackbox.js');
+/*const database = require('./0x3/firebase.js');*/
 const appstateFolderPath = path.join(
   __dirname,
   "0x3",
@@ -37,14 +37,27 @@ figlet.text(
     console.log();
 
     try {
+
+      const settingsFilePath = path.join(__dirname, ".", "json", "settings.json");
+      const settings = JSON.parse(await fs.readFile(settingsFilePath, "utf8"));
+
+      const listenEvents = settings[0].listenEvents;
+      const selfListen = settings[0].selfListen;
+      const autoMarkRead = settings[0].autoMarkRead;
+      const autoMarkDelivery = settings[0].autoMarkDelivery;
+      const forceLogin = settings[0].forceLogin;
+
       const files = await fs.readdir(appstateFolderPath);
       const appStates = files.filter((file) => path.extname(file) === ".json");
 
       const cmdFolder = path.join(__dirname, "cmds");
-      const cmdFiles = await fs.readdir(cmdFolder);
+      const cmdFiles = (await fs.readdir(cmdFolder)).filter((file) => path.extname(file) === ".js");
+
+      const eventFolder = path.join(__dirname, "events");
+      const eventFiles = (await fs.readdir(eventFolder)).filter((file) => path.extname(file) === ".js");
 
       const bar = new ProgressBar(chalk.cyan(":bar") + " :percent :etas", {
-        total: cmdFiles.length,
+        total: cmdFiles.length + eventFiles.length,
         width: 40,
         complete: "█",
         incomplete: " ",
@@ -53,6 +66,8 @@ figlet.text(
 
       const commandFiles = {};
       const commandErrors = [];
+      const eventHandlers = [];
+      const eventErrors = [];
 
       for (const file of cmdFiles) {
         const commandName = file.split(".")[0].toLowerCase();
@@ -66,11 +81,23 @@ figlet.text(
         bar.tick();
       }
 
+      for (const file of eventFiles) {
+        try {
+          const eventHandler = require(path.join(eventFolder, file));
+          eventHandlers.push(eventHandler);
+        } catch (error) {
+          eventErrors.push({ fileName: file, error });
+        }
+
+        bar.tick();
+      }
+
       if (bar.complete) {
-        console.log(chalk.green(`\n✅ Commands successfully integrated: ${cmdFiles.length - commandErrors.length}\n`));
+        console.log(chalk.green(`\n✅ Commands successfully integrated: ${cmdFiles.length - commandErrors.length}`));
+        console.log(chalk.green(`✅ Events successfully integrated: ${eventFiles.length - eventErrors.length}\n`));
 
         if (commandErrors.length > 0) {
-          console.log(chalk.red(`⚠️ Alert: ${commandErrors.length} command${commandErrors.length === 1 ? '' : 's'} could not be integrated:`));
+          console.log(chalk.red(`⚠️ Alert: ${commandErrors.length} file${commandErrors.length === 1 ? '' : 's'} could not be integrated:`));
 
           for (const { fileName, error } of commandErrors) {
             console.log(chalk.red(`Error detected in file: ${fileName}`));
@@ -84,7 +111,24 @@ figlet.text(
           }
           console.log();
         }
+
+        if (eventErrors.length > 0) {
+          console.log(chalk.red(`⚠️ Alert: ${eventErrors.length} event${eventErrors.length === 1 ? '' : 's'} could not be integrated:`));
+
+          for (const { fileName, error } of eventErrors) {
+            console.log(chalk.red(`Error detected in file: ${fileName}`));
+            console.log(chalk.red(`Reason: ${error}`));
+            if (error.stack) {
+              const stackLines = error.stack.split('\n');
+              const lineNumber = stackLines[1].match(/:(\d+):\d+\)$/)[1];
+              console.log(chalk.red(`Line: ${lineNumber}`));
+            }
+            console.log(chalk.red(`---------------------------------`));
+          }
+          console.log();
+        }
       }
+
       const userInformation = [];
 
       function displayUserInformation() {
@@ -110,7 +154,7 @@ figlet.text(
           login({ appState: appStateData }, async (err, api) => {
             if (err) {
               handleError(
-              `❌ Login failed. \nAuthentication record: ${appState}`,
+                `❌ Login failed. \nAuthentication record: ${appState}`,
                 err
               );
               resolve(null);
@@ -118,11 +162,11 @@ figlet.text(
             }
 
             api.setOptions({
-              listenEvents: true,
-              selfListen: false,
-              autoMarkRead: false,
-              autoMarkDelivery: false,
-              forceLogin: true,
+              listenEvents: listenEvents,
+              selfListen: selfListen,
+              autoMarkRead: autoMarkRead,
+              autoMarkDelivery: autoMarkDelivery,
+              forceLogin: forceLogin
             });
 
             api.getUserInfo(api.getCurrentUserID(), (err, ret) => {
@@ -164,7 +208,7 @@ figlet.text(
           setTimeout(async () => {
             try {
               await fs.unlink(path.join(appstateFolderPath, appStateToDelete));
-              console.log(chalk.green(`âœ… Appstate file successfully deleted: ${appStateToDelete}`));
+              console.log(chalk.green(`✅ Appstate file successfully deleted: ${appStateToDelete}`));
             } catch (deleteError) {
               console.error(chalk.red(`❌ Error during appstate file deletion: ${appStateToDelete}`, deleteError));
             }
@@ -178,69 +222,83 @@ figlet.text(
             return;
           }
 
+          for (const eventHandler of eventHandlers) {
+            try {
+              eventHandler(api, event);
+            } catch (error) {
+              handleError("Error executing event handler:", error, api);
+            }
+          }
+
           try {
+
             if (event.type === "message" || event.type === "message_reply") {
-              const input = event.body.toLowerCase().trim();
-              const matchingCommand = Object.keys(commandFiles).find(
-                (commandName) => {
-                  const commandPattern = new RegExp(
-                    `^${commandName}(\\s+.*|$)`
-                  );
+              const settingsFilePath = path.join(__dirname, ".", "json", "settings.json");
+              const settings = JSON.parse(await fs.readFile(settingsFilePath, "utf8"));
+
+              const userpanelFilePath = path.join(__dirname, ".", "json", "userpanel.json");
+              const userpanel = JSON.parse(await fs.readFile(userpanelFilePath, "utf8"));
+
+              const configFilePath = path.join(__dirname, ".", "json", "config.json");
+              const config = JSON.parse(await fs.readFile(configFilePath, "utf8"));
+              const prefix = config.prefix;
+              let input = event.body.toLowerCase().trim();
+
+              if (!input.startsWith(prefix) && prefix !== false) {
+                return;
+              }
+
+              if (prefix !== false) {
+                input = input.substring(prefix.length).trim();
+              }
+
+              try {
+                const matchingCommand = Object.keys(commandFiles).find((commandName) => {
+                  const commandPattern = new RegExp(`^${commandName}(\\s+.*|$)`);
                   return commandPattern.test(input);
-                }
-              );
+                });
 
-              const settingsFilePath = path.join(
-                __dirname,
-                ".",
-                "json",
-                "settings.json"
-              );
-              const settings = JSON.parse(
-                await fs.readFile(settingsFilePath, "utf8")
-              );
+                if (matchingCommand) {
+                  api.sendTypingIndicator(event.threadID);
+                  const cmd = commandFiles[matchingCommand];
+                  if (!settings[0].system && !userpanel.userpanel.VIPS.includes(event.senderID)) {
+                    api.sendMessage(
+                      "⚠️ Opps: The system is currently maintenance.\n\nNote: Only authorized users are permitted to use commands during this period.",
+                      event.threadID
+                    );
+                    return;
+                  }
 
-              const userpanelFilePath = path.join(
-                __dirname,
-                ".",
-                "json",
-                "userpanel.json"
-              );
-              const userpanel = JSON.parse(
-                await fs.readFile(userpanelFilePath, "utf8")
-              );
-
-              if (matchingCommand) {
-                const cmd = commandFiles[matchingCommand];
-                if (!settings[0].sys &&
-                  !userpanel.userpanel.VIPS.includes(event.senderID)) {
-                  api.sendMessage(
-                    "⚠️ Alert: The system is currently undergoing maintenance.\nNote: Only authorized users are permitted to use commands during this period.",
-                    event.threadID
-                  );
-                  return;
-                }
-
-                if (cmd) {
-                  if (cmd.config && cmd.run) {
-                    cmd.run({ api, event });
-                  } else if (typeof cmd === "function") {
-                    cmd(event, api);
-                  } else if (cmd.onStart) {
-                    cmd.onStart(event, api);
+                  if (cmd) {
+                    if (cmd.config && cmd.run) {
+                      cmd.run({ api, event });
+                    } else if (typeof cmd === "function") {
+                      cmd(event, api);
+                    } else if (cmd.onStart) {
+                      cmd.onStart(event, api);
+                    }
+                  }
+                } else {
+                  const isPrivateThread = event.threadID == event.senderID;
+                  const isGroupChat = !isPrivateThread;
+                  const containsQuestion = /(\b(can|help|what|how|did|where|who|give|example|ano|paano|pano)\b|\?|@el cano)/i.test(input);
+                  if (isPrivateThread) {
+                    api.sendTypingIndicator(event.threadID);
+                    nero(event, api);
+                  } else if (isGroupChat && containsQuestion) {
+                    api.sendTypingIndicator(event.threadID);
+                    nero(event, api);
                   }
                 }
-              } else {
-                const isPrivateThread = event.threadID == event.senderID;
-const isGroupChat = !isPrivateThread;
-/*const containsQuestion = /(\b(what|how|did|where|hi|hello|if|do|hey)\b|\?|@el)/i.test(input);*/
- const containsQuestion = /(what|how|why|where|did)\b/i.test(input);            
-if (isPrivateThread) {
-  pat(event, api);
-} else if (isGroupChat && containsQuestion) {
-  bes(event, api);
-}
-              }
+              } catch (error) {
+                console.error("Error handling the command:", error);
+              } /*finally {
+                try {
+                  await api.markAsReadAll();
+                } catch (markAsReadError) {
+                  console.error("Error marking messages as read:", markAsReadError);
+                }
+              }*/
             }
           } catch (error) {
             handleError(
@@ -251,7 +309,6 @@ if (isPrivateThread) {
           }
         });
       }
-
     } catch (error) {
       handleError("Error reading directory:", error);
     }
