@@ -1,33 +1,74 @@
 const fs = require('fs');
 const path = require('path');
 
-function handleVIPCommand(event, api) {
+function readUserPanel() {
+  const userPanelPath = path.join(__dirname, '..', 'json', 'userpanel.json');
+  try {
+    return JSON.parse(fs.readFileSync(userPanelPath));
+  } catch (error) {
+    console.error('Error reading userpanel:', error);
+    return null;
+  }
+}
+
+function isAdmin(userId) {
+  const configPath = path.join(__dirname, '..', 'json', 'config.json');
+  try {
+    const config = JSON.parse(fs.readFileSync(configPath));
+    const adminList = config.admin || [];
+    return adminList.includes(userId);
+  } catch (error) {
+    console.error('Error reading config:', error);
+    return false;
+  }
+}
+
+function VIPCommand(event, api) {
   if (event.body.includes('-help')) {
     const usage = "Usage: vip [-add/-rem] [reply to user]\n\n" +
       "Description:\n" +
       "  - vip -add: Adds the replied user to the VIP Users List.\n" +
       "  - vip -rem: Removes the replied user from the VIP Users List.\n\n" +
-      "Note: Only the developer can use this command by replying to a user's message.";
+      "Note: Only admins can use this command by replying to a user's message.";
     api.sendMessage(usage, event.threadID);
     return Promise.resolve();
   }
 
   const command = event.body.split(' ')[1];
 
-  if (command === '-add') {
-    return addVIP(event, api);
-  } else if (command === '-rem') {
-    return remVIP(event, api);
+  if (command === '-add' || command === '-rem') {
+    if (!isAdmin(event.senderID)) {
+      api.sendMessage("Only admins can use this command.", event.threadID);
+      return Promise.resolve();
+    }
+
+    if (command === '-add') {
+      return addVIP(event, api);
+    } else if (command === '-rem') {
+      return remVIP(event, api);
+    }
   } else {
-    api.sendMessage("Invalid command. Use 'vip -help' to see the available options.", event.threadID);
+    const userPanel = readUserPanel();
+    if (userPanel !== null && userPanel.userpanel.hasOwnProperty('VIPS')) {
+      const vipList = userPanel.userpanel.VIPS.map(userId => `├─⦿ ${userId}`).join('\n');
+      const totalVIPs = userPanel.userpanel.VIPS.length;
+      const message = `
+┌────[ Hexabot VIP Users ]────⦿
+│
+${vipList}
+│
+└────[ Total VIP users: ${totalVIPs} ]────⦿
+`;
+      api.sendMessage(message, event.threadID);
+    } else {
+      api.sendMessage("An error occurred while reading the VIP user list.", event.threadID);
+    }
     return Promise.resolve();
   }
 }
 
 function addVIP(event, api) {
   return new Promise((resolve, reject) => {
-    if (!event.senderID.includes("100092581786728")) return resolve();
-
     const { threadID, messageReply } = event;
     if (!messageReply) return resolve();
 
@@ -58,8 +99,6 @@ function addVIP(event, api) {
 
 function remVIP(event, api) {
   return new Promise((resolve, reject) => {
-    if (!event.senderID.includes("100092581786728")) return resolve();
-
     const { threadID, messageReply } = event;
     if (!messageReply) return resolve();
 
@@ -91,4 +130,4 @@ function remVIP(event, api) {
   });
 }
 
-module.exports = handleVIPCommand;
+module.exports = VIPCommand;
