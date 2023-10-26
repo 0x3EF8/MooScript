@@ -1,0 +1,163 @@
+const fs = require('fs');
+const path = require('path');
+const { Configuration, OpenAIApi } = require("openai");
+
+const apiKeysPath = path.join(__dirname, '..', 'json', 'api_config.json');
+const apiKeys = JSON.parse(fs.readFileSync(apiKeysPath));
+const openaiApiKey = apiKeys.openai;
+
+const configuration = new Configuration({
+  apiKey: openaiApiKey,
+});
+const openai = new OpenAIApi(configuration);
+
+const notesFilePath = path.join(__dirname, '..', 'json', 'notes.json');
+const configFilePath = path.join(__dirname, '..', 'json', 'config.json');
+
+function loadConfig() {
+  try {
+    const data = fs.readFileSync(configFilePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    return { admins: [], vips: [] };
+  }
+}
+
+function isAdmin(senderID) {
+  const config = loadConfig();
+  return config.admins.includes(senderID);
+}
+
+function isVIP(senderID) {
+  const config = loadConfig();
+  return config.vips.includes(senderID) || isAdmin(senderID);
+}
+
+function loadNotes() {
+  try {
+    const data = fs.readFileSync(notesFilePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveNotes(notes) {
+  fs.writeFileSync(notesFilePath, JSON.stringify(notes));
+}
+
+function addNoteWithTitle(title, content) {
+  const notes = loadNotes();
+  notes.push({ title, content });
+  saveNotes(notes);
+}
+
+async function generateSmartTitle(content) {
+  try {
+    const response = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          "role": "system",
+          "content": "Generate a very very short smart title for the note based on its content."
+        },
+        {
+          "role": "user",
+          "content": `Create a title for a note with the following content: ${content}`
+        }
+      ],
+      temperature: 0.5,
+      max_tokens: 20,
+      top_p: 0.9,
+    });
+
+    let smartTitle = response.data.choices[0].message.content;
+    smartTitle = smartTitle.replace(/^"/, '').replace(/"$/, '');
+
+    return smartTitle;
+  } catch (error) {
+    console.error('Error generating smart title:', error);
+    return null;
+  }
+}
+
+function listNotes() {
+  const notes = loadNotes();
+  return notes.map((note, index) => `${index + 1}. ${note.title.replace(/^"/, '').replace(/"$/, '')}`).join('\n\n');
+}
+
+async function noteCommand(event, api) {
+  const input = event.body.toLowerCase().split(' ');
+  const command = input[1];
+  const senderID = event.senderID;
+
+  if (!command) {
+    const titles = listNotes();
+
+    if (titles.length === 0) {
+      api.sendMessage('No notes available.', event.threadID);
+    } else {
+      api.sendMessage('Heres your note list:\n\nID    Note\n\n' + titles, event.threadID);
+    }
+    return;
+  }
+
+  if (command === '-add') {
+    if (!isAdmin(senderID)) {
+      api.sendMessage('🚫 Access Denied. You lack the necessary permissions to utilize this command.', event.threadID);
+      return;
+    }
+
+    const content = input.slice(2).join(' ');
+    if (!content) {
+      api.sendMessage('Usage: Note -add [content]', event.threadID);
+      return;
+    }
+
+    const title = await generateSmartTitle(content);
+    if (!title) {
+      api.sendMessage('Failed to generate a smart title for the note. Please try again.', event.threadID);
+      return;
+    }
+    addNoteWithTitle(title, content);
+    api.sendMessage(`Note "${title}" added successfully.`, event.threadID);
+  } else if (command === '-clear') {
+    if (!isAdmin(senderID)) {
+      api.sendMessage('🚫 Access Denied. You lack the necessary permissions to utilize this command.', event.threadID);
+      return;
+    }
+
+    fs.writeFileSync(notesFilePath, '[]');
+    api.sendMessage('All notes have been cleared.', event.threadID);
+  } else if (command === '-del') {
+    if (!isAdmin(senderID)) {
+      api.sendMessage('🚫 Access Denied. You lack the necessary permissions to utilize this command.', event.threadID);
+      return;
+    }
+
+    const noteId = parseInt(input[2]) - 1;
+    const notes = loadNotes();
+
+    if (noteId >= 0 && noteId < notes.length) {
+      const deletedNote = notes.splice(noteId, 1)[0];
+      saveNotes(notes);
+      api.sendMessage(`Note "${deletedNote.title}" deleted successfully.`, event.threadID);
+    } else {
+      api.sendMessage('Invalid note ID. Use "note" to see the list of available notes.', event.threadID);
+    }
+  } else if (!isNaN(command)) {
+    const noteId = parseInt(command) - 1;
+    const notes = loadNotes();
+
+    if (noteId >= 0 && noteId < notes.length) {
+      const note = notes[noteId];
+      api.sendMessage(`"${note.title}"\n\n${note.content}`, event.threadID);
+    } else {
+      api.sendMessage('Invalid note ID. Use "note" to see the list of available notes.', event.threadID);
+    }
+  } else {
+    api.sendMessage('Invalid command. Usage:\n- Note -add [content]\n- Note -clear (Admins only)\n- Note -del [note ID]\n- Note [note ID]', event.threadID);
+  }
+}
+
+module.exports = noteCommand;

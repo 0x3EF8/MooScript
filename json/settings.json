@@ -1,0 +1,13 @@
+[
+  {
+    "system": true,
+    "autoreact": true,
+    "antileave": true,
+    "antiunsend": false,
+    "listenEvents": true,
+    "selfListen": false,
+    "autoMarkRead": false,
+    "autoMarkDelivery": false,
+    "forceLogin": true
+  }
+]
