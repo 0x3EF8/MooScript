@@ -12,14 +12,14 @@ async function polli(event, api) {
     api.sendMessage(usage, event.threadID);
     return;
   }
-
-  const prompt = input.slice(6);
-  const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
+  const basePrompt = input.slice(6);
+  const prompt = await randomizer(basePrompt);
+  const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=-1&nologo=true`;
 
   try {
     api.sendMessage('🌼 Generating image...\nPlease wait while I process your request.', event.threadID);
     const imageBuffer = await downloadImage(imageUrl);
-    const imagePath = path.join(__dirname, '../temp/polliimg.png');
+    const imagePath = path.join(__dirname, `../temp/polliimg${prompt.replace(basePrompt, "")}.png`);
 
     fs.writeFileSync(imagePath, imageBuffer);
 
@@ -27,11 +27,17 @@ async function polli(event, api) {
       body: 'Here is the image you requested:',
       attachment: fs.createReadStream(imagePath)
     };
-    api.sendMessage(message, event.threadID, event.messageID);
+    api.sendMessage(message, event.threadID, () => fs.unlinkSync(imagePath), event.messageID);
   } catch (error) {
     console.error(error);
     api.sendMessage('🛠️ An error occurred while processing your request. Please try again later.', event.threadID, event.messageID);
   }
+}
+
+function randomizer(prompt) {
+  let randNum = Math.floor(Math.random() * (10000 - 1000 + 1) + 1000);
+  let newPrompt = prompt.concat("%", randNum);
+  return newPrompt;
 }
 
 async function downloadImage(imageUrl) {

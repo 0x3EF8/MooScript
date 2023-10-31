@@ -1,0 +1,6 @@
+node_modules/
+temp/*.png
+temp/*.jpg
+temp/*.gif
+temp/*.mp3
+temp/*.mp4
