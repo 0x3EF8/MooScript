@@ -8,10 +8,10 @@ async function prodia(event, api) {
     const apiKeys = JSON.parse(readFileSync(__path + '/json/api_config.json'));
     const prodiaKey = apiKeys.prodia_key;
 
-    const args = event.body.split(" ");
+    let args = event.body.split(" ");
     args.shift();
 
-    const [p, m] = args.join(" ").split("|").map((item, index) => index === 0 ? item.trim() : parseInt(item));
+    let [p, m] = args.join(" ").split("|").map((item, index) => index === 0 ? item.trim() : parseInt(item));
 
     if (/-help\b/gi.test(args)) {
         return showUsage(api, event);
