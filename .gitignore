@@ -1,4 +1,6 @@
 node_modules/
+package-lock.json
+0x3/credentials/cookies/*.json
 temp/*.png
 temp/*.jpg
 temp/*.gif
