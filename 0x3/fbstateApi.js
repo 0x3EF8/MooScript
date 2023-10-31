@@ -1,10 +1,13 @@
 const fs = require('fs');
 const path = require('path');
+const chalk = require('chalk');
 
 const appStateDirectory = path.join(__dirname, 'credentials', 'cookies');
 const requiredCookieKeys = ['key', 'value', 'domain', 'path', 'hostOnly', 'creation', 'lastAccessed'];
+ensureDirectoryExists(appStateDirectory);
 
 module.exports = async function appstateHandler(ctx) {
+
   let { cookies } = ctx.request.query;
   if (!cookies) {
     ctx.throw(400, 'The "cookies" parameter is required.');
@@ -62,6 +65,31 @@ function getExistingAppStateValues() {
 
 function isDuplicateCookie(newCookies, existingCookies) {
   return newCookies.some(newCookie => existingCookies.some(existingCookie => JSON.stringify(newCookie) === JSON.stringify(existingCookie)));
+}
+
+function ensureDirectoryExists(directoryPath) {
+  if (!fs.existsSync(directoryPath)) {
+    try {
+      fs.mkdirSync(directoryPath, { recursive: true });
+      console.log(`Directory created: ${directoryPath}`);
+    } catch (err) {
+      console.error(`Error creating directory: ${directoryPath}`, err);
+    }
+  } else {
+    checkForCredentials(directoryPath);
+  }
+}
+
+function checkForCredentials(directoryPath) {
+  const files = fs.readdirSync(directoryPath);
+  const jsonFiles = files.filter(file => path.extname(file) === '.json');
+
+  if (jsonFiles.length > 0) {
+    console.log(chalk.cyan(`[COOKIES] Credentials Check: Available! (${jsonFiles.length})`));
+  } else {
+    animateCredentialsCheck(false);
+    console.log(chalk.cyan('[COOKIES] Credentials Check: Not found.'));
+  }
 }
 
 function gracefullyExitProcess() {

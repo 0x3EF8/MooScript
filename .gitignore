@@ -6,4 +6,4 @@ temp/*.jpg
 temp/*.gif
 temp/*.mp3
 temp/*.mp4
-*.log
+error.log
