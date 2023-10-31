@@ -1,3 +1,0 @@
-2023-10-31T08:17:16.441Z [error]: Error reading directory:
-TypeError: Cannot read properties of null (reading '1')
-    at /home/saikidesu/Desktop/VSCODE-PLAYGROUND/Hexabot/index.js:137:70
