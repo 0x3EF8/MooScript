@@ -1,15 +1,3 @@
-2023-10-31T05:01:30.414Z [error]: ❌ Login failed. 
-Authentication record: Nero.json
-[object Object]
-2023-10-31T06:43:46.543Z [error]: Error reading directory:
-TypeError: Type error
-    at WebSocket (native)
-    at new BunWebSocket (ws:69:14)
-    at WebSocketStream (/home/saikidesu/Desktop/VSCODE-PLAYGROUND/Hexabot/node_modules/websocket-stream/stream.js:68:11)
-    at <anonymous> (/home/saikidesu/Desktop/VSCODE-PLAYGROUND/Hexabot/node_modules/fca-unofficial/src/listenMqtt.js:102:23)
-    at <anonymous> (/home/saikidesu/Desktop/VSCODE-PLAYGROUND/Hexabot/node_modules/mqtt/lib/client.js:265:23)
-    at new MqttClient (/home/saikidesu/Desktop/VSCODE-PLAYGROUND/Hexabot/node_modules/mqtt/lib/client.js:243:20)
-    at listenMqtt (/home/saikidesu/Desktop/VSCODE-PLAYGROUND/Hexabot/node_modules/fca-unofficial/src/listenMqtt.js:102:23)
-    at <anonymous> (/home/saikidesu/Desktop/VSCODE-PLAYGROUND/Hexabot/node_modules/fca-unofficial/src/listenMqtt.js:784:8)
-    at <anonymous> (/home/saikidesu/Desktop/VSCODE-PLAYGROUND/Hexabot/index.js:249:19)
-    at processTicksAndRejections (:61:39)
+2023-10-31T08:17:16.441Z [error]: Error reading directory:
+TypeError: Cannot read properties of null (reading '1')
+    at /home/saikidesu/Desktop/VSCODE-PLAYGROUND/Hexabot/index.js:137:70

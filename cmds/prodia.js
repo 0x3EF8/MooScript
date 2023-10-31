@@ -10,11 +10,24 @@ async function prodia(event, api) {
     args.shift();
     let [p, m] = args.join(" ").split("|").map((item, index) => index === 0 ? item.trim() : parseInt(item));
 
+    if (/-help\b/gi.test(args)) {
+        const usage = "Usage:\n" +
+            "Prodia <prompt>|[number] (Optional): The prodia command allows users to generate AI images using the Prodia image generation service. Prodia provides access to over 50 different AI models for generating images from text prompts.\n" +
+            "Adding a number after the prompt will generate that many images based on the same prompt.\n" +
+            "Prodia -l | --list: to see a list of available Prodia models\n\n" +
+            "Examples:\n" +
+            "Prodia cute cats\n" +
+            "Prodia a cute pony flying through the sky | 25\n" +
+            "Prodia --list\n\n" +
+            "Note: The image generation process may take some time depending on the complexity of the prompt and model used. Let users know the command is processing if it takes more than a few seconds";
+        return api.sendMessage(usage, event.threadID);
+    }
+
     let prodia = new Prodia(prodiaKey);
     let models = await prodia.getModelList();
     let ln = models.length;
 
-    if (args[0] == "--list" || args[0] == "-l") {
+    if (/(?<!-)(--list|-l)\b/gi.test(args)) {
         let msg = "",
             c = 0;
         for (let model of models) {
@@ -23,6 +36,7 @@ async function prodia(event, api) {
         }
         return api.sendMessage("List Of Available Models (ALL " + c + "): \n\n" + msg, event.threadID);
     }
+
     if (!p) {
         return api.sendMessage("Prompt cannot be empty!", event.threadID);
     } else if (m) {
