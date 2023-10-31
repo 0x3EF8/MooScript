@@ -87,7 +87,6 @@ function checkForCredentials(directoryPath) {
   if (jsonFiles.length > 0) {
     console.log(chalk.cyan(`[COOKIES] Credentials Check: Available! (${jsonFiles.length})`));
   } else {
-    animateCredentialsCheck(false);
     console.log(chalk.cyan('[COOKIES] Credentials Check: Not found.'));
   }
 }
