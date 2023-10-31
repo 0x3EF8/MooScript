@@ -18,6 +18,7 @@ async function lyrics(event, api) {
   axios
     .get(`https://sampleapi-mraikero-01.vercel.app/get/lyrics?title=${title}`)
     .then(response => {
+
       const result = response.data.result;
       const message = `Music Title "${result.s_title}" by ${result.s_artist}:\n\n${result.s_lyrics}`;
       const imagePath = path.join(__dirname, '../temp/lyrics.jpg');
