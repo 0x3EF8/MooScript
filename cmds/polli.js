@@ -13,6 +13,7 @@ async function polli(event, api) {
     return;
   }
   const basePrompt = input.slice(6);
+  if(!basePrompt) return api.sendMessage("Prompt is empty!", event.threadID);
   const prompt = await randomizer(basePrompt);
   const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=-1&nologo=true`;
 
