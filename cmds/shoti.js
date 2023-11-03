@@ -1,7 +1,6 @@
 const axios = require('axios');
 const fs = require('fs');
 const request = require('request');
-let usedID;
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -20,12 +19,13 @@ async function shoti(event, api) {
       return;
     }
 
-    const apiUrl = 'https://shoti-api.libyzxy0.repl.co/api/get-shoti?apikey=shoti-1h72d5ggbqqnk4aj0sg';
+    const apiUrl = 'https://api--v1-shoti.vercel.app/api/v1/get';
 
     try {
-      const response = await axios.get(apiUrl);
+      const response = await axios.post(apiUrl, {
+        apikey: "shoti-1h72d5ggbqqnk4aj0sg",
+      });
       const videoUrl = response.data.data.url;
-      usedID = response.data.data.id;
       await new Promise((resolve, reject) => {
         request(videoUrl)
           .pipe(fs.createWriteStream(`${__dirname}/../temp/shoti.mp4`))
@@ -37,7 +37,7 @@ async function shoti(event, api) {
 
       api.setMessageReaction("✅", event.messageID, (err) => { }, true);
       api.sendMessage({
-        body: `@${response.data.user.username}`,
+        body: `@${response.data.data.user.username}`,
         attachment: fs.createReadStream(`${__dirname}/../temp/shoti.mp4`)
       }, event.threadID, event.messageID);
     } catch (error) {
