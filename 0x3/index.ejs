@@ -5,109 +5,111 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
     <style>
         /* Define custom colors using CSS variables */
-:root {
-    --primary-color: #282c34;
-    --secondary-color: #61dafb;
-    --white-color: #f8f8f2;
-    --bg-color: #282c34;
-    --error-color: #e06c75;
-    --success-color: #98c379;
-}
+      :root {
+          --primary-color: #282c34;
+          --secondary-color: #61dafb;
+          --white-color: #f8f8f2;
+          --bg-color: #282c34;
+          --error-color: #e06c75;
+          --success-color: #98c379;
+      }
 
-/* Apply styles to the entire document */
-body, html {
-    height: 100%;
-    font-family: 'Orbitron', sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    color: var(--white-color);
-}
+      body, html {
+          height: 100%;
+          font-family: 'Orbitron', sans-serif;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          /*overflow: hidden;*/
+          color: var(--white-color);
+      }
 
-/* Background animation canvas */
-canvas {
-    /* Fixed position to cover the entire viewport */
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    width: 100%;
-    height: 100%;
-    background-color: hsla(240deg, 20%, 20%, 1);
-}
+      /* Background animation canvas */
+      canvas {
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index: -1;
+          width: 100%;
+          height: 100%;
+          background-color: hsla(240deg, 20%, 20%, 1);
+      }
 
-/* Styling for the main content container */
-#BotGenius {
-    position: absolute;
-    width: 50%;
-    padding: 20px;
-    border-radius: 10px;
-    box-sizing: border-box;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-}
+      #BotGenius {
+          position: relative;
+          width: 80%; 
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          border-radius: 10px;
+          box-sizing: border-box;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      }
 
-/* Heading and paragraph styles */
-#BotGenius h2, #BotGenius p {
-    text-align: center;
-    color: var(--secondary-color);
-}
+      /* Heading and paragraph styles */
+      #BotGenius h2, #BotGenius p {
+          text-align: center;
+          color: var(--secondary-color);
+      }
 
-/* Styling for form fields */
-#BotGenius .form-field {
-    margin-bottom: 20px;
-}
+      /* Styling for form fields */
+     /* #BotGenius .form-field {
+         margin-top: 20px;
+          margin-bottom: 20px;
+      }*/
 
-/* Label styles */
-#BotGenius label {
-    display: block;
-    color: var(--white-color);
-    margin-bottom: 5px;
-}
+      /* Label styles */
+    /* #BotGenius label {
+          display: block;
+          color: var(--white-color);
+          margin-bottom: 5px;
+      }*/
 
-/* Textarea style for cookies */
-#appstate {
-    /* Full width and height, with padding */
-    width: 100%;
-    height: 220px;
-    padding: 10px;
-    color: var(--secondary-color);
-    background-color: transparent;
-    border: 2px solid var(--secondary-color);
-    box-sizing: border-box;
-    border-radius: 5px;
-    font-family: 'Orbitron', sans-serif;
-    resize: none;
-}
+      /* Textarea style for cookies */
+      #appstate {
+          width: 100%;
+          height: 160px;
+          padding: 10px;
+          color: var(--secondary-color);
+          background-color: transparent;
+          border: 2px solid var(--secondary-color);
+          box-sizing: border-box;
+          border-radius: 5px;
+          font-family: 'Orbitron', sans-serif;
+          resize: none;
+      }
 
-/* Button styles */
-#getcookies, #submit {
-    background-color: var(--secondary-color);
-    color: var(--primary-color);
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    margin-bottom: 1rem;
-}
+      /* Button styles */
+      #getcookies, #submit {
+          background-color: var(--secondary-color);
+          color: var(--primary-color);
+          border: none;
+          padding: 10px 20px;
+          cursor: pointer;
+          border-radius: 5px;
+          transition: all 0.3s ease;
+          font-family: 'Orbitron', sans-serif;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+          margin-bottom: 1rem;
+      }
+      #submit {
+        margin-top: 1rem;
+      }
+      /* Button hover effect */
+      #getcookies:hover, #submit:hover {
+          background-color: var(--white-color);
+          color: var(--primary-color);
+      }
 
-/* Button hover effect */
-#getcookies:hover, #submit:hover {
-    background-color: var(--white-color);
-    color: var(--primary-color);
-}
+      /* Additional styles for 'Get Cookies' button */
+      #getcookies {
+          margin-top: 10px;
+          float: right;
+      }
 
-/* Additional styles for 'Get Cookies' button */
-#getcookies {
-    margin-top: 10px;
-    float: right;
-}
 
 /* Styling for checkbox and agreement label */
 #agreement-section label {
@@ -427,6 +429,30 @@ canvas {
         margin: 0 0.2rem;
     }
 }
+
+      /* Media query for smaller screens */
+      @media (max-width: 768px) {
+          #appstate {
+              height: 200px;
+          }
+          #BotGenius {
+              width: 90%;
+          }
+      }
+
+      /* Media query for even smaller screens */
+      @media (max-width: 600px) {
+          #BotGenius {
+              width: 95%;
+          }
+      }
+
+      /* Media query for even smaller screens */
+      @media (max-width: 400px) {
+          #BotGenius {
+              width: 100%;
+          }
+      }
     </style>
 </head>
 <body>
