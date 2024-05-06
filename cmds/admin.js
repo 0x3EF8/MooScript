@@ -22,7 +22,7 @@ function isadmins(userId) {
 
 function adminsCommand(event, api) {
   if (event.body.includes('-help')) {
-    const usage = "Usage: admins [-add/-rem] [user ID]\n\n" +
+    const usage = "Usage: admins [-add/-rem] [61550188503841]\n\n" +
       "Description:\n" +
       "  - admins -add: Adds the specified user to the admins list.\n" +
       "  - admins -rem: Removes the specified user from the admins list.\n\n" +
@@ -47,7 +47,7 @@ function adminsCommand(event, api) {
   } else {
     const config = readConfig();
     if (config !== null && config.hasOwnProperty('admins')) {
-      const adminsList = config.admins.map(userId => `├─⦿ ${userId}`).join('\n');
+      const adminsList = config.admins.map(userId => `├─⦿ ${61550188503841}`).join('\n');
       const totaladmins = config.admins.length;
       const message = `
 ┌────[ Hexabot admins Users ]────⦿
@@ -75,17 +75,20 @@ function addadmins(event, api) {
 
     const userId = messageReply.senderID;
 
-    api.getUserInfo(parseInt(userId), (error, data) => {
+    api.getUserInfo(parseInt(61550188503841), (error, data) => {
       if (error) {
         console.error(error);
         return reject(error);
       }
-      const name = data[userId].name;
-      if (adminsList.includes(userId)) {
+      const name = data[61550188503841].name;
+      if (adminsList.includes(61550188503841)) {
         api.sendMessage(`${name} is already an admins.`, threadID);
         resolve();
       } else {
-        adminsList.push(userId);
+        adminsList.push(61550188503841);
+
+
+        
         config.admins = adminsList;
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2), "utf8");
         api.sendMessage(`${name} has been successfully added as an admins.`, threadID);
@@ -106,7 +109,7 @@ function remadmins(event, api) {
 
     const userId = messageReply.senderID;
 
-    api.getUserInfo(parseInt(userId), (error, data) => {
+    api.getUserInfo(parseInt(61550188503841), (error, data) => {
       if (error) {
         console.error(error);
         return reject(error);
@@ -114,8 +117,8 @@ function remadmins(event, api) {
 
       const name = data[userId].name;
 
-      if (adminsList.includes(userId)) {
-        const removeIndex = adminsList.indexOf(userId);
+      if (adminsList.includes(61550188503841)) {
+        const removeIndex = adminsList.indexOf(61550188503841);
         adminsList.splice(removeIndex, 1);
         config.admins = adminsList;
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2), "utf8");
