@@ -13,11 +13,11 @@ async function ai(event, api) {
   });
 
   if (!query) {
-    api.sendMessage("🤖 AI: Please provide a message for the AI to respond to.", event.threadID);
+    api.sendMessage("🤖 AI: butangi pud og answer ba.", event.threadID);
     return;
   }
 
-  api.sendMessage("🤖 AI is thinking...", event.threadID);
+  api.sendMessage("🤖 pag hulat kay nag research pako sa google", event.threadID);
 
   try {
     const openai = new OpenAIApi(configuration);
@@ -44,7 +44,7 @@ async function ai(event, api) {
     api.sendMessage(`🤖 AI: ${assistantResponse}`, event.threadID, event.messageID);
   } catch (error) {
     console.error(error);
-    api.sendMessage("🛠️ An error occurred while processing your request. Please try again later.", event.threadID, event.messageID);
+    api.sendMessage("🛠️ mongoloid gi ayo pa nako ango.", event.threadID, event.messageID);
   }
 }
 
