@@ -1,1 +1,13 @@
-{}
+{
+  "mid.$gABn-qBbO5TOYmNgOn2SZ5LANzUZX": {
+    "type": "message",
+    "senderID": "100093099606387",
+    "body": "cmd",
+    "threadID": "7316872308385075",
+    "messageID": "mid.$gABn-qBbO5TOYmNgOn2SZ5LANzUZX",
+    "attachments": [],
+    "mentions": {},
+    "timestamp": "1728314525343",
+    "isGroup": true
+  }
+}
