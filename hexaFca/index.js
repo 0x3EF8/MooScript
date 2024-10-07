@@ -81,18 +81,28 @@ function buildAPI(globalOptions, html, jar) {
   var cookie = jar.getCookies("https://www.facebook.com");
   var maybeUser = cookie.filter(function (val) { return val.cookieString().split("=")[0] === "c_user"; });
   var maybeTiktik = cookie.filter(function (val) { return val.cookieString().split("=")[0] === "i_user"; });
+  
   if (maybeUser.length === 0 && maybeTiktik.length === 0) {
-    return logger("Không tìm thấy cookie cho người dùng, vui lòng kiểm tra lại thông tin đăng nhập", 'error');
+    throw {
+      error:
+        'Error retrieving userID. This can be caused by a lot of things, including getting blocked by Facebook for logging in from an unknown location. Try logging in with a browser to verify.',
+    };
   } else {
     if (html.indexOf("/checkpoint/block/?next") > -1) {
-      return logger("Appstate die, vui lòng thay cái mới!", 'error');
+      return log.warn(
+        'login',
+        'Checkpoint detected. Please log in with a browser to verify.'
+      );
     }
     if (maybeTiktik[0] && maybeTiktik[0].cookieString().includes('i_user')) {
       userID = maybeTiktik[0].cookieString().split("=")[1].toString();
     } else {
       userID = maybeUser[0].cookieString().split("=")[1].toString();
     }
+
+    log.info('login', `Logged in as ${userID}`);
   }
+  
 
   try {
     clearInterval(checkVerified);
