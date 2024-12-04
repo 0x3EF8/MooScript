@@ -28,7 +28,7 @@ jobs:
         with:
           source-directory: gen
           destination-github-username: '0x3EF8'
-          destination-repository-name: 'Hexabot'
+          destination-repository-name: 'MooScript'
           target-directory: gen
           user-email: 0x3ef8@gmail.com
           commit-message: Update Changes
